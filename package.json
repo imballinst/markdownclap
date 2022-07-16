@@ -11,6 +11,11 @@
   "devDependencies": {
     "@astrojs/solid-js": "0.4.0",
     "astro": "1.0.0-beta.72",
-    "solid-js": "1.4.3"
+    "solid-js": "1.4.3",
+    "vite-plugin-monaco-editor": "1.1.0"
+  },
+  "dependencies": {
+    "marked": "4.0.18",
+    "monaco-editor": "0.33.0"
   }
 }
