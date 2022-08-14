@@ -2346,15 +2346,10 @@ nanoid@^3.3.4:
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.4.tgz#730b67e3cd09e2deacf03c027c81c9d9dbc5e8ab"
   integrity sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==
 
-nanostores@0.6.0:
+nanostores@0.6.0, nanostores@^0.5.12:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/nanostores/-/nanostores-0.6.0.tgz#2eb82c611843fc01a04ddc19e5b4853aa015e71c"
   integrity sha512-CQpKE8wtaJAr66hbg32t0MOAeybzLywU6UsLAX18kyQL/bME+xwhjWpmrvJRBp5kueFy6hs2oHlt3HFpNP+JaA==
-
-nanostores@^0.5.12:
-  version "0.5.13"
-  resolved "https://registry.yarnpkg.com/nanostores/-/nanostores-0.5.13.tgz#81b6a3b1cbb3f099bcb1c002a78859b03b7c0a9d"
-  integrity sha512-UxC2eZsCbbcHZ1Z/hwFQ1C4gy8Tkhzskvmu6wOsAhOMAOd72HmVX1Nxs96DSDUcd7V1x0IdRtsl+zAm7rg7slA==
 
 nlcst-to-string@^2.0.0:
   version "2.0.4"

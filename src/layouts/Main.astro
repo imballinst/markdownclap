@@ -1,83 +1,13 @@
 ---
-import MarkdownEditor from "../components/Editor/MarkdownEditor";
-import SidebarEditor from "../components/Editor/SidebarEditor";
+import EntryEditor from "../components/Editor/index";
 ---
 
 <main>
-  <h1>Welcome to <span class="text-gradient">As21tro</span></h1>
-
-  <div class="editor">
-    <MarkdownEditor client:visible />
-    <SidebarEditor client:visible />
-  </div>
+  <EntryEditor client:visible />
 </main>
 
 <style>
-  :root {
-    --astro-gradient: linear-gradient(0deg, #4f39fa, #da62c4);
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    margin: 0;
-  }
-
   main {
-    padding: 1em;
-  }
-
-  .editor {
-    display: flex;
-    flex-direction: row;
-  }
-
-  .text-gradient {
-    font-weight: 900;
-    background-image: var(--astro-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-size: 100% 200%;
-    background-position-y: 100%;
-    border-radius: 0.4rem;
-    animation: pulse 4s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-
-    0%,
-    100% {
-      background-position-y: 0%;
-    }
-
-    50% {
-      background-position-y: 80%;
-    }
-  }
-
-  .instructions {
-    line-height: 1.6;
-    margin: 1rem 0;
-    background: #4f39fa;
     padding: 1rem;
-    border-radius: 0.4rem;
-    color: var(--color-bg);
-  }
-
-  .instructions code {
-    font-size: 0.875em;
-    border: 0.1em solid var(--color-border);
-    border-radius: 4px;
-    padding: 0.15em 0.25em;
-  }
-
-  .link-card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(24ch, 1fr));
-    gap: 1rem;
-    padding: 0;
   }
 </style>

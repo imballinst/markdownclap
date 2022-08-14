@@ -1,32 +1,81 @@
-import { createSignal, JSX } from 'solid-js';
+import { createSignal, JSX, onMount } from 'solid-js';
 import { marked } from 'marked';
 
-import { editorStore, openEditorSidebar } from '../../store/editor';
+import {
+  closeEditorSidebar,
+  editorStore,
+  openEditorSidebar
+} from '../../store/editor';
 import './MarkdownEditor.scss';
 import { useStore } from '@nanostores/solid';
+import { isKeycodeNumber } from '../../utils/key-parser';
+import { addHeading } from '../../utils/headings';
 
 const MarkdownEditor = () => {
-  const [markdown, setMarkdown] = createSignal('');
+  const [markdown, setMarkdown] = createSignal('qweqwe\n\nzzz\n\nqweqwe');
   const editor = useStore(editorStore);
+  let textareaElement: HTMLTextAreaElement | undefined;
 
   const onKeyDown: JSX.TextareaHTMLAttributes<HTMLTextAreaElement>['onKeyDown'] =
     (e) => {
       if (e.code === 'Tab') {
         e.preventDefault();
-        setMarkdown((prev) => prev + '  ');
+        return setMarkdown((prev) => prev + '  ');
+      }
+
+      if (isKeycodeNumber(e.key) && e.altKey && e.ctrlKey) {
+        const number = Number(e.key);
+        const { selectionStart, selectionEnd } = e.currentTarget;
+
+        return queueMicrotask(() => {
+          const headingStr = addHeading(number);
+
+          setMarkdown((currentValue) => {
+            let lastNewlineIndex =
+              selectionStart === 0 ? 0 : selectionStart - 1;
+            let found = false;
+
+            while (!found && lastNewlineIndex > 0) {
+              if (currentValue.charAt(lastNewlineIndex) === '\n') {
+                found = true;
+                break;
+              }
+              lastNewlineIndex--;
+            }
+
+            if (lastNewlineIndex === 0) {
+              return `${headingStr}${currentValue}`;
+            }
+
+            return currentValue
+              .slice(0, lastNewlineIndex + 1)
+              .concat(headingStr)
+              .concat(currentValue.slice(lastNewlineIndex + 1));
+          });
+          textareaElement?.setSelectionRange(
+            selectionStart + headingStr.length,
+            selectionEnd + headingStr.length
+          );
+        });
       }
     };
 
   return (
-    <div
-      style={{
-        width: editor().isSidebarOpen ? '50%' : '100%'
-      }}
-    >
-      <button onClick={() => openEditorSidebar('table')}>
+    <>
+      <button
+        onClick={() => {
+          const { isSidebarOpen } = editor();
+          if (isSidebarOpen) {
+            closeEditorSidebar();
+          } else {
+            openEditorSidebar('table');
+          }
+        }}
+      >
         Open in sidebar
       </button>
       <textarea
+        ref={textareaElement}
         class="markdown-editor"
         value={markdown()}
         onKeyDown={onKeyDown}
@@ -35,7 +84,7 @@ const MarkdownEditor = () => {
         }}
       />
       <pre innerHTML={marked(markdown())} />
-    </div>
+    </>
   );
 };
 
