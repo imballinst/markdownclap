@@ -2,7 +2,7 @@ import { useStore } from '@nanostores/solid';
 
 import MarkdownEditor from './MarkdownEditor';
 import SidebarEditor from './SidebarEditor';
-import './index.scss';
+import './index.css';
 import { editorStore } from '../../store/editor';
 
 export default function EntryEditor() {

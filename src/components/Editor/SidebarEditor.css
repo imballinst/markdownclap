@@ -1,0 +1,11 @@
+.sidebar-editor-result > table {
+  border-width: theme(borderWidth.2);
+  border-color: theme(borderColor.slate.500)
+}
+
+.sidebar-editor-result > table th,
+.sidebar-editor-result > table td {
+  padding: theme(spacing.1) theme(spacing.2);
+  border-width: theme(borderWidth.2);
+  border-color: theme(borderColor.slate.500)
+}

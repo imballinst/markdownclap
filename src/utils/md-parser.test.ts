@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
-import { isTableString } from './md-parser';
+import { ParsedStringResult, parseTableString } from './md-parser';
 
-describe('isTableString', () => {
+describe('parseTableString', () => {
   describe('valid table', () => {
     test('1 column', () => {
       let table = `
@@ -9,14 +9,55 @@ describe('isTableString', () => {
         | ---- |
         | hehe |
       `;
-      expect(isTableString(table)).toBe(true);
+      const result: ParsedStringResult = {
+        type: 'table',
+        rawContent: table,
+        content: {
+          headers: [
+            {
+              content: 'Name',
+              post: ' ',
+              pre: ' '
+            }
+          ],
+          rows: [
+            [
+              {
+                content: 'hehe',
+                post: ' ',
+                pre: ' '
+              }
+            ]
+          ]
+        }
+      };
+      expect(parseTableString(table)).toEqual(result);
 
       table = `
         |Name|
         |-|
         |hehe|
       `;
-      expect(isTableString(table)).toBe(true);
+      result.rawContent = table;
+      result.content = {
+        headers: [
+          {
+            content: 'Name',
+            post: '',
+            pre: ''
+          }
+        ],
+        rows: [
+          [
+            {
+              content: 'hehe',
+              post: '',
+              pre: ''
+            }
+          ]
+        ]
+      };
+      expect(parseTableString(table)).toEqual(result);
     });
 
     test('2 columns', () => {
@@ -25,14 +66,75 @@ describe('isTableString', () => {
         | ---- | -------- |
         | hehe | hehehehe |
       `;
-      expect(isTableString(table)).toBe(true);
+      const result: ParsedStringResult = {
+        type: 'table',
+        rawContent: table,
+        content: {
+          headers: [
+            {
+              content: 'Name',
+              post: ' ',
+              pre: ' '
+            },
+            {
+              content: 'Username',
+              post: ' ',
+              pre: ' '
+            }
+          ],
+          rows: [
+            [
+              {
+                content: 'hehe',
+                post: ' ',
+                pre: ' '
+              },
+              {
+                content: 'hehehehe',
+                post: ' ',
+                pre: ' '
+              }
+            ]
+          ]
+        }
+      };
+      expect(parseTableString(table)).toEqual(result);
 
       table = `
         |Name|Username|
         |-|-|
         |hehe|hehehehe|
       `;
-      expect(isTableString(table)).toBe(true);
+      result.rawContent = table;
+      result.content = {
+        headers: [
+          {
+            content: 'Name',
+            post: '',
+            pre: ''
+          },
+          {
+            content: 'Username',
+            post: '',
+            pre: ''
+          }
+        ],
+        rows: [
+          [
+            {
+              content: 'hehe',
+              post: '',
+              pre: ''
+            },
+            {
+              content: 'hehehehe',
+              post: '',
+              pre: ''
+            }
+          ]
+        ]
+      };
+      expect(parseTableString(table)).toEqual(result);
     });
 
     test('3 columns', () => {
@@ -41,30 +143,192 @@ describe('isTableString', () => {
         | ---- | -------- | ---------- |
         | hehe | hehehehe | hehehehehe |
       `;
-      expect(isTableString(table)).toBe(true);
+      const result: ParsedStringResult = {
+        type: 'table',
+        rawContent: table,
+        content: {
+          headers: [
+            {
+              content: 'Name',
+              post: ' ',
+              pre: ' '
+            },
+            {
+              content: 'Username',
+              post: ' ',
+              pre: ' '
+            },
+            {
+              content: 'Created At',
+              post: ' ',
+              pre: ' '
+            }
+          ],
+          rows: [
+            [
+              {
+                content: 'hehe',
+                post: ' ',
+                pre: ' '
+              },
+              {
+                content: 'hehehehe',
+                post: ' ',
+                pre: ' '
+              },
+              {
+                content: 'hehehehehe',
+                post: ' ',
+                pre: ' '
+              }
+            ]
+          ]
+        }
+      };
+      expect(parseTableString(table)).toEqual(result);
 
       table = `
         |Name|Username|Created At|
         |-|----|---|
-        |he|heh|he|
+        |hehe|hehehehe|hehehehehe|
       `;
-      expect(isTableString(table)).toBe(true);
+      result.rawContent = table;
+      result.content = {
+        headers: [
+          {
+            content: 'Name',
+            post: '',
+            pre: ''
+          },
+          {
+            content: 'Username',
+            post: '',
+            pre: ''
+          },
+          {
+            content: 'Created At',
+            post: '',
+            pre: ''
+          }
+        ],
+        rows: [
+          [
+            {
+              content: 'hehe',
+              post: '',
+              pre: ''
+            },
+            {
+              content: 'hehehehe',
+              post: '',
+              pre: ''
+            },
+            {
+              content: 'hehehehehe',
+              post: '',
+              pre: ''
+            }
+          ]
+        ]
+      };
+      expect(parseTableString(table)).toEqual(result);
     });
 
     test('3 columns, escaped |', () => {
       let table = `
         | Name | Username | Created At |
         | ---- | -------- | ---------- |
-        | hehe | hehehehe | heh \\|| hee |
+        | hehe | hehehehe | heh \\| hee |
       `;
-      expect(isTableString(table)).toBe(true);
+      const result: ParsedStringResult = {
+        type: 'table',
+        rawContent: table,
+        content: {
+          headers: [
+            {
+              content: 'Name',
+              post: ' ',
+              pre: ' '
+            },
+            {
+              content: 'Username',
+              post: ' ',
+              pre: ' '
+            },
+            {
+              content: 'Created At',
+              post: ' ',
+              pre: ' '
+            }
+          ],
+          rows: [
+            [
+              {
+                content: 'hehe',
+                post: ' ',
+                pre: ' '
+              },
+              {
+                content: 'hehehehe',
+                post: ' ',
+                pre: ' '
+              },
+              {
+                content: 'heh \\| hee',
+                post: ' ',
+                pre: ' '
+              }
+            ]
+          ]
+        }
+      };
+      expect(parseTableString(table)).toEqual(result);
 
       table = `
         |Name|Username|Created At|
         |-|----|---|
-        |he|heh|heh\\||hee|
+        |hehe|hehehehe|heh \\| hee|
       `;
-      expect(isTableString(table)).toBe(true);
+      result.rawContent = table;
+      result.content = {
+        headers: [
+          {
+            content: 'Name',
+            post: '',
+            pre: ''
+          },
+          {
+            content: 'Username',
+            post: '',
+            pre: ''
+          },
+          {
+            content: 'Created At',
+            post: '',
+            pre: ''
+          }
+        ],
+        rows: [
+          [
+            {
+              content: 'hehe',
+              post: '',
+              pre: ''
+            },
+            {
+              content: 'hehehehe',
+              post: '',
+              pre: ''
+            },
+            {
+              content: 'heh \\| hee',
+              post: '',
+              pre: ''
+            }
+          ]
+        ]
+      };
+      expect(parseTableString(table)).toEqual(result);
     });
   });
 
@@ -74,13 +338,13 @@ describe('isTableString', () => {
         | Name |
         | ---- |
       `;
-      expect(isTableString(table)).toBe(false);
+      expect(parseTableString(table)).toEqual(undefined);
 
       table = `
         |Name|
         |-|
       `;
-      expect(isTableString(table)).toBe(false);
+      expect(parseTableString(table)).toEqual(undefined);
     });
 
     test('invalid header/body separator', () => {
@@ -89,14 +353,14 @@ describe('isTableString', () => {
         |||
         | hehe | hehehehe |
       `;
-      expect(isTableString(table)).toBe(false);
+      expect(parseTableString(table)).toEqual(undefined);
 
       table = `
         |Name|Username|
         |||
         |hehe|hehehehe|
       `;
-      expect(isTableString(table)).toBe(false);
+      expect(parseTableString(table)).toEqual(undefined);
     });
 
     test('inequal columns in header', () => {
@@ -105,14 +369,14 @@ describe('isTableString', () => {
         | ---- |
         | hehe | hehehehe |
       `;
-      expect(isTableString(table)).toBe(false);
+      expect(parseTableString(table)).toEqual(undefined);
 
       table = `
         |Name|
         ||
         |hehe|hehehehe|
       `;
-      expect(isTableString(table)).toBe(false);
+      expect(parseTableString(table)).toEqual(undefined);
     });
 
     test('inequal columns in body', () => {
@@ -121,14 +385,14 @@ describe('isTableString', () => {
         |||
         | hehe |
       `;
-      expect(isTableString(table)).toBe(false);
+      expect(parseTableString(table)).toEqual(undefined);
 
       table = `
         |Name|Username|
         |||
         |hehe|
       `;
-      expect(isTableString(table)).toBe(false);
+      expect(parseTableString(table)).toEqual(undefined);
     });
   });
 });

@@ -1,65 +1,114 @@
-export function isTableString(str: string): boolean {
+export type ParsedStringResult = ParsedTableResult | undefined;
+
+export interface ParsedTableResult {
+  type: 'table';
+  rawContent: string;
+  content: {
+    headers: ParsedColumn[];
+    rows: ParsedColumn[][];
+  };
+}
+
+export interface ParsedColumn {
+  content: string;
+  pre: string;
+  post: string;
+}
+
+export function parseTableString(str: string): ParsedStringResult {
   const arr = str.trim().split('\n');
   const [headers, headerBodySeparator, ...body] = arr;
-  if (!headers.includes('|')) {
-    return false;
+  const isContainColumnSeparator = headers.includes('|');
+  if (!isContainColumnSeparator) {
+    return undefined;
   }
 
-  const headerColumns: string[] = getColumns(headers);
-  const isHeaderValid = headerColumns.every((headerText) => headerText !== '');
-  if (!isHeaderValid) {
-    return false;
+  const headerColumns: ParsedColumn[] = getColumns(headers);
+  const areAllHeadersNonEmpty = headerColumns.every((headerText) => headerText.content !== '');
+  if (!areAllHeadersNonEmpty) {
+    return undefined;
   }
 
   const headerColumnsLength = headerColumns.length;
   const headerBodySeparatorColumns = getColumns(headerBodySeparator);
-  if (headerBodySeparatorColumns.length !== headerColumnsLength) {
-    return false;
+  let isLengthEqual = headerBodySeparatorColumns.length === headerColumnsLength;
+  if (!isLengthEqual) {
+    return undefined;
   }
 
-  if (!headerBodySeparatorColumns.every((column) => column.includes('-'))) {
-    return false;
-  }
-
-  if (body.length === 0) {
-    return false;
-  }
-
-  return body.every(
-    (bodyRow) => getColumns(bodyRow).length === headerColumnsLength
+  const isSeparatorRowValid = headerBodySeparatorColumns.every((column) =>
+    column.content.includes('-')
   );
+  if (!isSeparatorRowValid) {
+    return undefined;
+  }
+
+  const isBodyEmpty = body.length === 0;
+  if (isBodyEmpty) {
+    return undefined;
+  }
+
+  const rowsColumns = body.map((bodyRow) => getColumns(bodyRow));
+  isLengthEqual = rowsColumns.every((rowColumns) => rowColumns.length === headerColumnsLength);
+  if (!isLengthEqual) {
+    return undefined;
+  }
+
+  return {
+    type: 'table',
+    rawContent: str,
+    content: {
+      headers: headerColumns,
+      rows: rowsColumns
+    }
+  };
 }
 
 // Helper functions.
-function getColumns(line: string): string[] {
-  const trimmed = line.trim();
+const ESCAPED_SEPARATOR = '\\|';
+
+function getColumns(line: string): ParsedColumn[] {
+  // Trim the line, then remove the first and last "|".
+  const trimmed = line.trim().slice(1, -1);
   const length = trimmed.length;
-  const columns: string[] = [];
-  let state: 'open' | 'close' = 'close';
+  const columns: ParsedColumn[] = [];
+  let i = 0;
   let text = '';
+  let previousSeparatorIndex = 0;
 
-  for (let i = 0; i < length; i += 1) {
+  while (i < length) {
     const char = trimmed.charAt(i);
+    const nextChar = trimmed.charAt(i + 1);
+    const isLastChar = i + 1 === length;
+    const isSeparator = char === '|';
+    text += char;
 
-    if (char === '\\') {
-      const nextChar = trimmed.charAt(i + 1);
-      const escapedSeparator = '\\|';
+    if (char + nextChar === ESCAPED_SEPARATOR) {
+      text += nextChar;
+      i += 1;
+    } else if (isSeparator || isLastChar) {
+      // Go to next column segment, or the end of the columns.
+      let content = text.trim();
+      let postIndex = i + 1;
 
-      if (char + nextChar === escapedSeparator) {
-        text += char + nextChar;
-        i += 2;
+      if (isSeparator) {
+        content = content.slice(0, -1).trim();
+        postIndex = i;
       }
-    } else if (char === '|') {
-      state = state === 'close' ? 'open' : 'close';
-    } else {
-      text += char;
+
+      const pre = trimmed.slice(previousSeparatorIndex, trimmed.indexOf(content));
+      const post = trimmed.slice(trimmed.indexOf(content) + content.length, postIndex);
+
+      columns.push({
+        pre,
+        post,
+        content
+      });
+      text = '';
+      previousSeparatorIndex = isSeparator ? i + 1 : i;
     }
 
-    if (state === 'close') {
-      columns.push(text.trim());
-      state = 'open';
-      text = '';
-    }
+    i += 1;
   }
 
   return columns;
