@@ -1,19 +1,24 @@
 import { atom } from 'nanostores';
 
 export interface EditorState {
-  isSidebarOpen: boolean;
-  elementType: 'table' | undefined;
+  sidebarContent:
+    | {
+        type: 'table' | undefined;
+        content: string;
+      }
+    | undefined;
 }
 
 export const editorStore = atom<EditorState>({
-  isSidebarOpen: false,
-  elementType: undefined
+  sidebarContent: undefined
 });
 
-export function openEditorSidebar(elementType: EditorState['elementType']) {
-  editorStore.set({ elementType, isSidebarOpen: true });
+export function openEditorSidebar(
+  sidebarContent: EditorState['sidebarContent']
+) {
+  editorStore.set({ sidebarContent });
 }
 
 export function closeEditorSidebar() {
-  editorStore.set({ elementType: undefined, isSidebarOpen: false });
+  editorStore.set({ sidebarContent: undefined });
 }

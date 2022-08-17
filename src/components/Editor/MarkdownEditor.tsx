@@ -1,4 +1,4 @@
-import { createSignal, JSX, onMount } from 'solid-js';
+import { createSignal, JSX } from 'solid-js';
 import { marked } from 'marked';
 
 import {
@@ -10,9 +10,22 @@ import './MarkdownEditor.scss';
 import { useStore } from '@nanostores/solid';
 import { isKeycodeNumber } from '../../utils/key-parser';
 import { addHeading } from '../../utils/headings';
+import { isTableString } from '../../utils/md-parser';
+
+const DEFAULT_STRING = `
+qweqwe
+
+|Name|
+|-|
+|hehe|
+
+zzz
+
+qweqwe
+`.trim();
 
 const MarkdownEditor = () => {
-  const [markdown, setMarkdown] = createSignal('qweqwe\n\nzzz\n\nqweqwe');
+  const [markdown, setMarkdown] = createSignal(DEFAULT_STRING);
   const editor = useStore(editorStore);
   let textareaElement: HTMLTextAreaElement | undefined;
 
@@ -64,11 +77,25 @@ const MarkdownEditor = () => {
     <>
       <button
         onClick={() => {
-          const { isSidebarOpen } = editor();
-          if (isSidebarOpen) {
+          const { sidebarContent } = editor();
+          const value = markdown();
+          let isTable = false;
+
+          if (textareaElement) {
+            const effectiveValue = value.slice(
+              textareaElement.selectionStart,
+              textareaElement.selectionEnd
+            );
+            isTable = isTableString(effectiveValue);
+
+            // Remove the currently selected element.
+            textareaElement.setSelectionRange(0, 0);
+          }
+
+          if (sidebarContent !== undefined) {
             closeEditorSidebar();
-          } else {
-            openEditorSidebar('table');
+          } else if (isTable) {
+            openEditorSidebar({ content: value, type: 'table' });
           }
         }}
       >
