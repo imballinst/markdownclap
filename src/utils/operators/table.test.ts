@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { getTableRawContent, ParsedStringResult, parseTableString } from './md-parser';
+import { getTableRawContent, ParsedStringResult, parseTableString } from './table';
 
 describe('parseTableString', () => {
   describe('valid table', () => {
@@ -630,5 +630,15 @@ describe('getTableRawContent', () => {
       ]
     };
     expect(getTableRawContent(content)).toEqual(result);
+  });
+});
+
+describe('alterColumn', () => {
+  describe('add', () => {
+    // TODO.
+  });
+
+  describe('remove', () => {
+    // TODO.
   });
 });

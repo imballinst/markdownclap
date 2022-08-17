@@ -1,3 +1,6 @@
+import { alterArray } from '../array';
+
+// Types.
 export type ParsedStringResult = ParsedTableResult | undefined;
 
 export interface ParsedTableResult {
@@ -14,6 +17,69 @@ export interface ParsedColumn {
   content: string;
   pre: string;
   post: string;
+}
+
+// Main functions.
+export function alterColumn({
+  content,
+  action
+}: {
+  content: ParsedTableResult['content'];
+  action:
+    | {
+        type: 'add';
+        columnIdx: number;
+        content: {
+          header: ParsedColumn;
+          separator: ParsedColumn;
+          columns: ParsedColumn[];
+        };
+      }
+    | {
+        type: 'remove';
+        columnIdx: number;
+      };
+}): ParsedTableResult['content'] {
+  const newContent = { ...content };
+  const { type, columnIdx } = action;
+
+  switch (type) {
+    case 'add': {
+      newContent.headers = alterArray(newContent.headers, columnIdx, {
+        type: 'add',
+        element: action.content.header
+      });
+      newContent.separators = alterArray(newContent.separators, columnIdx, {
+        type: 'add',
+        element: action.content.separator
+      });
+
+      const rowsLength = newContent.rows.length;
+      const actionRowsLength = action.content.columns.length;
+
+      if (rowsLength !== actionRowsLength) {
+        throw new Error(
+          `The content rows\' length is not equal to \`action.content.columns\`. Expected ${rowsLength} but received ${actionRowsLength}.`
+        );
+      }
+
+      newContent.rows = newContent.rows.map((rowColumns, index) =>
+        alterArray(rowColumns, columnIdx, {
+          type: 'add',
+          element: action.content.columns[index]
+        })
+      );
+    }
+    case 'remove': {
+      newContent.headers = alterArray(newContent.headers, columnIdx, { type: 'remove' });
+      newContent.separators = alterArray(newContent.separators, columnIdx, { type: 'remove' });
+      newContent.rows = newContent.rows.map((rowColumns) =>
+        alterArray(rowColumns, columnIdx, { type: 'remove' })
+      );
+    }
+  }
+
+  return newContent;
 }
 
 export function getTableRawContent(content: ParsedTableResult['content']): string {

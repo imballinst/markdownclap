@@ -6,7 +6,7 @@ import './MarkdownEditor.css';
 import { useStore } from '@nanostores/solid';
 import { isKeycodeNumber } from '../../utils/key-parser';
 import { addHeading } from '../../utils/headings';
-import { ParsedStringResult, parseTableString } from '../../utils/md-parser';
+import { ParsedStringResult, parseTableString } from '../../utils/operators/table';
 
 const DEFAULT_STRING = `
 qweqwe
