@@ -1,4 +1,4 @@
-import { createSignal, JSX } from 'solid-js';
+import { createEffect, createSignal, JSX } from 'solid-js';
 import { marked } from 'marked';
 
 import { closeEditorSidebar, editorStore, openEditorSidebar } from '../../store/editor';
@@ -22,8 +22,25 @@ qweqwe
 
 const MarkdownEditor = () => {
   const [markdown, setMarkdown] = createSignal(DEFAULT_STRING);
+  const [selected, setSelected] = createSignal([0, 0]);
   const editor = useStore(editorStore);
   let textareaElement: HTMLTextAreaElement | undefined;
+
+  createEffect<string | undefined>((previous) => {
+    const rawContent = editor().sidebarContent?.rawContent;
+
+    if (previous !== undefined && rawContent !== undefined && previous !== rawContent) {
+      const [start, end] = selected();
+      const selectedLength = end - start;
+      const rawContentLength = rawContent.length;
+      const diff = rawContentLength - selectedLength;
+
+      setSelected([start, end + diff]);
+      setMarkdown(markdown().slice(0, start).concat(rawContent).concat(markdown().slice(end)));
+    }
+
+    return rawContent;
+  }, editor().sidebarContent?.rawContent);
 
   const onKeyDown: JSX.TextareaHTMLAttributes<HTMLTextAreaElement>['onKeyDown'] = (e) => {
     if (e.code === 'Tab') {
@@ -76,11 +93,15 @@ const MarkdownEditor = () => {
           let parseResult: ParsedStringResult = undefined;
 
           if (textareaElement) {
-            effectiveValue = effectiveValue.slice(
-              textareaElement.selectionStart,
-              textareaElement.selectionEnd
-            );
+            const { selectionStart, selectionEnd } = textareaElement;
+
+            effectiveValue = effectiveValue.slice(selectionStart, selectionEnd);
             parseResult = parseTableString(effectiveValue);
+
+            // Save the last selected text.
+            if (parseResult !== undefined) {
+              setSelected([selectionStart, selectionEnd]);
+            }
 
             // Remove the currently selected element.
             textareaElement.setSelectionRange(0, 0);

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { ParsedStringResult, parseTableString } from './md-parser';
+import { getTableRawContent, ParsedStringResult, parseTableString } from './md-parser';
 
 describe('parseTableString', () => {
   describe('valid table', () => {
@@ -16,6 +16,13 @@ describe('parseTableString', () => {
           headers: [
             {
               content: 'Name',
+              post: ' ',
+              pre: ' '
+            }
+          ],
+          separators: [
+            {
+              content: '----',
               post: ' ',
               pre: ' '
             }
@@ -43,6 +50,13 @@ describe('parseTableString', () => {
         headers: [
           {
             content: 'Name',
+            post: '',
+            pre: ''
+          }
+        ],
+        separators: [
+          {
+            content: '-',
             post: '',
             pre: ''
           }
@@ -82,6 +96,18 @@ describe('parseTableString', () => {
               pre: ' '
             }
           ],
+          separators: [
+            {
+              content: '----',
+              post: ' ',
+              pre: ' '
+            },
+            {
+              content: '--------',
+              post: ' ',
+              pre: ' '
+            }
+          ],
           rows: [
             [
               {
@@ -115,6 +141,18 @@ describe('parseTableString', () => {
           },
           {
             content: 'Username',
+            post: '',
+            pre: ''
+          }
+        ],
+        separators: [
+          {
+            content: '-',
+            post: '',
+            pre: ''
+          },
+          {
+            content: '-',
             post: '',
             pre: ''
           }
@@ -164,6 +202,23 @@ describe('parseTableString', () => {
               pre: ' '
             }
           ],
+          separators: [
+            {
+              content: '----',
+              post: ' ',
+              pre: ' '
+            },
+            {
+              content: '--------',
+              post: ' ',
+              pre: ' '
+            },
+            {
+              content: '----------',
+              post: ' ',
+              pre: ' '
+            }
+          ],
           rows: [
             [
               {
@@ -207,6 +262,23 @@ describe('parseTableString', () => {
           },
           {
             content: 'Created At',
+            post: '',
+            pre: ''
+          }
+        ],
+        separators: [
+          {
+            content: '-',
+            post: '',
+            pre: ''
+          },
+          {
+            content: '----',
+            post: '',
+            pre: ''
+          },
+          {
+            content: '---',
             post: '',
             pre: ''
           }
@@ -261,6 +333,23 @@ describe('parseTableString', () => {
               pre: ' '
             }
           ],
+          separators: [
+            {
+              content: '----',
+              post: ' ',
+              pre: ' '
+            },
+            {
+              content: '--------',
+              post: ' ',
+              pre: ' '
+            },
+            {
+              content: '----------',
+              post: ' ',
+              pre: ' '
+            }
+          ],
           rows: [
             [
               {
@@ -304,6 +393,23 @@ describe('parseTableString', () => {
           },
           {
             content: 'Created At',
+            post: '',
+            pre: ''
+          }
+        ],
+        separators: [
+          {
+            content: '-',
+            post: '',
+            pre: ''
+          },
+          {
+            content: '----',
+            post: '',
+            pre: ''
+          },
+          {
+            content: '---',
             post: '',
             pre: ''
           }
@@ -394,5 +500,135 @@ describe('parseTableString', () => {
       `;
       expect(parseTableString(table)).toEqual(undefined);
     });
+  });
+});
+
+describe('getTableRawContent', () => {
+  test('with spacings', () => {
+    const result = `
+| Name | Username | Created At |
+| ---- | -------- | ---------- |
+| hehe | hehehehe | heh \\| hee |
+      `.trim();
+    const content: NonNullable<ParsedStringResult>['content'] = {
+      headers: [
+        {
+          content: 'Name',
+          post: ' ',
+          pre: ' '
+        },
+        {
+          content: 'Username',
+          post: ' ',
+          pre: ' '
+        },
+        {
+          content: 'Created At',
+          post: ' ',
+          pre: ' '
+        }
+      ],
+      separators: [
+        {
+          content: '----',
+          post: ' ',
+          pre: ' '
+        },
+        {
+          content: '--------',
+          post: ' ',
+          pre: ' '
+        },
+        {
+          content: '----------',
+          post: ' ',
+          pre: ' '
+        }
+      ],
+      rows: [
+        [
+          {
+            content: 'hehe',
+            post: ' ',
+            pre: ' '
+          },
+          {
+            content: 'hehehehe',
+            post: ' ',
+            pre: ' '
+          },
+          {
+            content: 'heh \\| hee',
+            post: ' ',
+            pre: ' '
+          }
+        ]
+      ]
+    };
+    expect(getTableRawContent(content)).toEqual(result);
+  });
+
+  test('without spacings', () => {
+    const result = `
+|Name|Username|Created At|
+|-|----|---|
+|hehe|hehehehe|heh \\| hee|
+    `.trim();
+    const content: NonNullable<ParsedStringResult>['content'] = {
+      headers: [
+        {
+          content: 'Name',
+          post: '',
+          pre: ''
+        },
+        {
+          content: 'Username',
+          post: '',
+          pre: ''
+        },
+        {
+          content: 'Created At',
+          post: '',
+          pre: ''
+        }
+      ],
+      separators: [
+        {
+          content: '-',
+          post: '',
+          pre: ''
+        },
+        {
+          content: '----',
+          post: '',
+          pre: ''
+        },
+        {
+          content: '---',
+          post: '',
+          pre: ''
+        }
+      ],
+      rows: [
+        [
+          {
+            content: 'hehe',
+            post: '',
+            pre: ''
+          },
+          {
+            content: 'hehehehe',
+            post: '',
+            pre: ''
+          },
+          {
+            content: 'heh \\| hee',
+            post: '',
+            pre: ''
+          }
+        ]
+      ]
+    };
+    expect(getTableRawContent(content)).toEqual(result);
   });
 });

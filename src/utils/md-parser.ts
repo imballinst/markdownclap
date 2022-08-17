@@ -5,6 +5,7 @@ export interface ParsedTableResult {
   rawContent: string;
   content: {
     headers: ParsedColumn[];
+    separators: ParsedColumn[];
     rows: ParsedColumn[][];
   };
 }
@@ -13,6 +14,20 @@ export interface ParsedColumn {
   content: string;
   pre: string;
   post: string;
+}
+
+export function getTableRawContent(content: ParsedTableResult['content']): string {
+  const headers = content.headers
+    .map((header) => header.pre + header.content + header.post)
+    .join('|');
+  const separators = content.separators
+    .map((separator) => separator.pre + separator.content + separator.post)
+    .join('|');
+  const rows = content.rows.map((row) =>
+    row.map((column) => column.pre + column.content + column.post).join('|')
+  );
+
+  return `|${headers}|\n|${separators}|\n|${rows}|`;
 }
 
 export function parseTableString(str: string): ParsedStringResult {
@@ -59,6 +74,7 @@ export function parseTableString(str: string): ParsedStringResult {
     rawContent: str,
     content: {
       headers: headerColumns,
+      separators: headerBodySeparatorColumns,
       rows: rowsColumns
     }
   };
@@ -97,7 +113,10 @@ function getColumns(line: string): ParsedColumn[] {
       }
 
       const pre = trimmed.slice(previousSeparatorIndex, trimmed.indexOf(content));
-      const post = trimmed.slice(trimmed.indexOf(content) + content.length, postIndex);
+      const post = trimmed.slice(
+        trimmed.indexOf(content, previousSeparatorIndex) + content.length,
+        postIndex
+      );
 
       columns.push({
         pre,

@@ -17,7 +17,7 @@ export function closeEditorSidebar() {
   editorStore.set({ sidebarContent: undefined });
 }
 
-export function updateSidebarTable(sidebarContent: NonNullable<ParsedStringResult>) {
+export function updateSidebarTable(sidebarContent: Omit<NonNullable<ParsedStringResult>, 'type'>) {
   const oldSidebarContent = editorStore.get().sidebarContent;
   if (oldSidebarContent === undefined) return;
 
