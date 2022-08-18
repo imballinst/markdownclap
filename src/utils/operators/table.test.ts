@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'vitest';
-import { getTableRawContent, ParsedStringResult, parseTableString } from './table';
+import {
+  alterColumn,
+  getTableRawContent,
+  ParsedStringResult,
+  ParsedTableResult,
+  parseTableString
+} from './table';
 
 describe('parseTableString', () => {
   describe('valid table', () => {
@@ -634,11 +640,116 @@ describe('getTableRawContent', () => {
 });
 
 describe('alterColumn', () => {
-  describe('add', () => {
-    // TODO.
+  test('add', () => {
+    const content: ParsedTableResult['content'] = {
+      headers: [
+        {
+          content: 'Name',
+          post: '',
+          pre: ''
+        }
+      ],
+      separators: [
+        {
+          content: '-',
+          post: '',
+          pre: ''
+        }
+      ],
+      rows: Array.from(new Array(5), (_, idx) => [
+        {
+          content: `User ${idx + 1}`,
+          post: '',
+          pre: ''
+        }
+      ])
+    };
+    const alterContent = {
+      header: {
+        content: 'No.',
+        post: '',
+        pre: ''
+      },
+      separator: {
+        content: '-',
+        post: '',
+        pre: ''
+      },
+      columns: Array.from(new Array(5), (_, idx) => ({
+        content: `${idx + 1}`,
+        post: '',
+        pre: ''
+      }))
+    };
+    const result = alterColumn({
+      content,
+      action: {
+        columnIdx: 0,
+        content: alterContent,
+        type: 'add'
+      }
+    });
+
+    const expected: ParsedTableResult['content'] = {
+      headers: [alterContent.header, ...content.headers],
+      separators: [alterContent.separator, ...content.separators],
+      rows: content.rows.map((columns, rowIdx) => [alterContent.columns[rowIdx], ...columns])
+    };
+    expect(expected).toEqual(result);
   });
 
-  describe('remove', () => {
-    // TODO.
+  test('remove', () => {
+    const content: ParsedTableResult['content'] = {
+      headers: [
+        {
+          content: 'No',
+          post: '',
+          pre: ''
+        },
+        {
+          content: 'Name',
+          post: '',
+          pre: ''
+        }
+      ],
+      separators: [
+        {
+          content: '-',
+          post: '',
+          pre: ''
+        },
+        {
+          content: '-',
+          post: '',
+          pre: ''
+        }
+      ],
+      rows: Array.from(new Array(5), (_, idx) => [
+        {
+          content: `${idx + 1}`,
+          post: '',
+          pre: ''
+        },
+        {
+          content: `User ${idx + 1}`,
+          post: '',
+          pre: ''
+        }
+      ])
+    };
+    const result = alterColumn({
+      content,
+      action: {
+        columnIdx: 0,
+        type: 'remove'
+      }
+    });
+
+    const expected: ParsedTableResult['content'] = {
+      headers: content.headers.slice(1),
+      separators: content.separators.slice(1),
+      rows: content.rows.map((columns) => columns.slice(1))
+    };
+    expect(expected).toEqual(result);
   });
 });

@@ -69,6 +69,7 @@ export function alterColumn({
           element: action.content.columns[index]
         })
       );
+      break;
     }
     case 'remove': {
       newContent.headers = alterArray(newContent.headers, columnIdx, { type: 'remove' });
