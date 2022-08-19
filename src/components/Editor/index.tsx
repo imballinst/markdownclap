@@ -1,7 +1,7 @@
 import { useStore } from '@nanostores/solid';
 
-import MarkdownEditor from './MarkdownEditor';
-import SidebarEditor from './SidebarEditor';
+import { MarkdownEditor } from './MarkdownEditor';
+import { SidebarEditor } from './SidebarEditor';
 import './index.css';
 import { editorStore } from '../../store/editor';
 

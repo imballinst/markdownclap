@@ -28,7 +28,7 @@ Sample paragraph
 Sample paragraph
 `.trim();
 
-const MarkdownEditor = () => {
+export const MarkdownEditor = () => {
   const [markdown, setMarkdown] = createSignal(DEFAULT_STRING);
   const [selected, setSelected] = createSignal([0, 0]);
   const editor = useStore(editorStore);
@@ -137,7 +137,3 @@ const MarkdownEditor = () => {
     </>
   );
 };
-
-export default MarkdownEditor;
-
-// Helper functions.

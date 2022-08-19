@@ -1,12 +1,11 @@
 import { useStore } from '@nanostores/solid';
-// import { marked } from 'marked';
 import { createSignal, Show } from 'solid-js';
 import { editorStore, updateSidebarTable } from '../../store/editor';
 import { getTableRawContent, ParsedTableResult } from '../../utils/operators/table';
 
 import './SidebarEditor.css';
 
-export default function SidebarEditor() {
+export function SidebarEditor() {
   const editor = useStore(editorStore);
 
   return (
@@ -90,5 +89,17 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
         </tbody>
       </table>
     </div>
+  );
+}
+
+function HeaderButton() {
+  const button = createSignal();
+  const popover = createSignal();
+
+  return (
+    <>
+      <button>Actions</button>
+      <div role="presentation">Content</div>
+    </>
   );
 }
