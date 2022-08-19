@@ -9,15 +9,23 @@ import { addHeading } from '../../utils/headings';
 import { ParsedStringResult, parseTableString } from '../../utils/operators/table';
 
 const DEFAULT_STRING = `
-qweqwe
+Sample paragraph
 
-|Name|
-|-|
-|hehe|
+|No|Name|
+|-|-|
+|1|hehe|
+|2|hehe|
+|3|hehe|
+|4|hehe|
+|5|hehe|
+|6|hehe|
+|7|hehe|
+|8|hehe|
+|9|hehe|
+|10|hehe|
+|11|hehe|
 
-zzz
-
-qweqwe
+Sample paragraph
 `.trim();
 
 const MarkdownEditor = () => {

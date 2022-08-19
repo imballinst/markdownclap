@@ -1,5 +1,5 @@
 import { atom } from 'nanostores';
-import { ParsedStringResult, ParsedTableResult } from '../utils/md-parser';
+import { ParsedStringResult, ParsedTableResult } from '../utils/operators/table';
 
 export interface EditorState {
   sidebarContent: ParsedStringResult;
