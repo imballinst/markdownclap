@@ -90,11 +90,15 @@ export function getTableRawContent(content: ParsedTableResult['content']): strin
   const separators = content.separators
     .map((separator) => separator.pre + separator.content + separator.post)
     .join('|');
-  const rows = content.rows.map((row) =>
-    row.map((column) => column.pre + column.content + column.post).join('|')
-  );
+  const rows = content.rows
+    .map((row) => {
+      const rowStr = row.map((column) => column.pre + column.content + column.post).join('|');
+      // Remember, we stripped these |s during parsing.
+      return `|${rowStr}|`;
+    })
+    .join('\n');
 
-  return `|${headers}|\n|${separators}|\n|${rows}|`;
+  return `|${headers}|\n|${separators}|\n${rows}`;
 }
 
 export function parseTableString(str: string): ParsedStringResult {

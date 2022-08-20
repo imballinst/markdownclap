@@ -1,7 +1,8 @@
 import { useStore } from '@nanostores/solid';
-import { createSignal, Show } from 'solid-js';
+import { createSignal, JSX, Show } from 'solid-js';
+import { Portal } from 'solid-js/web';
 import { editorStore, updateSidebarTable } from '../../store/editor';
-import { getTableRawContent, ParsedTableResult } from '../../utils/operators/table';
+import { getTableRawContent, ParsedColumn, ParsedTableResult } from '../../utils/operators/table';
 
 import './SidebarEditor.css';
 
@@ -9,11 +10,11 @@ export function SidebarEditor() {
   const editor = useStore(editorStore);
 
   return (
-    <>
+    <div class="sidebar-editor">
       <Show when={editor().sidebarContent !== undefined}>
         <Table result={editor().sidebarContent} />
       </Show>
-    </>
+    </div>
   );
 }
 
@@ -23,7 +24,37 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
     return null;
   }
 
+  const editor = useStore(editorStore);
   const [content, setContent] = createSignal(result.content);
+
+  function onSubmit(params: ColumnAction) {
+    switch (params.type) {
+      case 'fill-column': {
+        if (params.payload.columnContentType === 'ordered-number') {
+          let newRows = editor().sidebarContent?.content.rows || [];
+          newRows = newRows.map((columns, index) => {
+            const newColumns: ParsedColumn[] = [...columns];
+            newColumns[params.payload.columnIndex] = {
+              ...newColumns[params.payload.columnIndex],
+              content: `${index + 1}`
+            };
+            return newColumns;
+          });
+
+          const newContent = {
+            headers: editor().sidebarContent!.content.headers,
+            separators: editor().sidebarContent!.content.separators,
+            rows: newRows
+          };
+
+          updateSidebarTable({
+            content: newContent,
+            rawContent: getTableRawContent(newContent)
+          });
+        }
+      }
+    }
+  }
 
   return (
     <div>
@@ -40,6 +71,13 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
 
       <table>
         <thead>
+          <tr>
+            {content().headers.map((_, index) => (
+              <th>
+                <HeaderButton columnIndex={index} onSubmit={onSubmit} />
+              </th>
+            ))}
+          </tr>
           <tr>
             {content().headers.map((header, index) => (
               <th>
@@ -92,14 +130,146 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
   );
 }
 
-function HeaderButton() {
-  const button = createSignal();
-  const popover = createSignal();
+interface PopoverStyleState {
+  top: `${number}px`;
+  left: `${number}px`;
+}
 
+type ColumnContentType = 'ordered-number' | 'add-column-before';
+type ColumnAction = {
+  type: 'add-column-before' | 'add-column-after' | 'fill-column';
+  payload: {
+    columnIndex: number;
+    columnContentType: ColumnContentType;
+  };
+};
+
+type ColumnActionsType =
+  | 'add-column-before'
+  | 'add-column-after'
+  | 'delete-column'
+  | 'move-column'
+  | 'fill-column';
+
+interface HeaderButtonProps {
+  columnIndex: number;
+  onSubmit: (params: ColumnAction) => void;
+}
+
+export function HeaderButton({ onSubmit: onSubmitProp, columnIndex }: HeaderButtonProps) {
+  const [popoverStyle, setPopoverStyle] = createSignal<PopoverStyleState>({
+    left: '0px',
+    top: '0px'
+  });
+  const [isPopoverShown, setIsPopoverShown] = createSignal(false);
+  const [columnAction, setColumnAction] = createSignal<ColumnActionsType>('add-column-after');
+
+  const onSubmit: JSX.DOMAttributes<HTMLFormElement>['onSubmit'] = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const type = formData.get('type') as ColumnActionsType;
+    const actionPayload = formData.get('actionPayload');
+
+    if (type === 'add-column-after' || type === 'add-column-before' || type === 'fill-column') {
+      onSubmitProp({
+        type,
+        payload: {
+          columnIndex,
+          columnContentType: actionPayload as ColumnContentType
+        }
+      });
+    }
+  };
+
+  // Implementation especially for the WAI-ARIA thingy is heavily inspired by https://mui.com/material-ui/react-popover/.
   return (
     <>
-      <button>Actions</button>
-      <div role="presentation">Content</div>
+      <button
+        type="button"
+        class="text-xs"
+        onClick={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          setPopoverStyle({ left: `${rect.left}px`, top: `${rect.top + rect.height}px` });
+          setIsPopoverShown(true);
+        }}
+      >
+        Actions
+      </button>
+
+      <Show when={isPopoverShown()}>
+        <Portal>
+          <div role="presentation" class="popover-root">
+            <div
+              aria-hidden="true"
+              class="popover-backdrop"
+              onClick={() => {
+                setIsPopoverShown(false);
+              }}
+            />
+            <div tabIndex={-1} class="popover-dropdown" style={popoverStyle()}>
+              <form onSubmit={onSubmit}>
+                <div class="flex flex-col">
+                  <label class="text-xs">Select column action</label>
+                  <select
+                    class="text-xs"
+                    name="type"
+                    onInput={(e) => {
+                      setColumnAction(e.currentTarget.value as ColumnActionsType);
+                    }}
+                  >
+                    <option class="text-xs" value="add-column-before">
+                      Add column before
+                    </option>
+                    <option class="text-xs" value="add-column-after">
+                      Add column after
+                    </option>
+                    <option class="text-xs" value="delete-column">
+                      Delete column
+                    </option>
+                    <option class="text-xs" value="move-column">
+                      Move column
+                    </option>
+                    <option class="text-xs" value="fill-column">
+                      Fill column
+                    </option>
+                  </select>
+                </div>
+
+                <Show
+                  when={
+                    columnAction() === 'add-column-after' ||
+                    columnAction() === 'add-column-before' ||
+                    columnAction() === 'fill-column'
+                  }
+                >
+                  <div class="flex flex-col">
+                    <label class="text-xs">Column type</label>
+                    <select name="actionPayload" class="text-xs">
+                      <option class="text-xs" value="ordered-number">
+                        Ordered number
+                      </option>
+                      <option class="text-xs" value="add-column-before">
+                        String
+                      </option>
+                    </select>
+                  </div>
+                </Show>
+
+                <Show when={columnAction() === 'move-column'}>
+                  <div class="flex flex-col">
+                    <label class="text-xs">Column number</label>
+                    <input name="actionPayload" type="text" />
+                  </div>
+                </Show>
+
+                <button type="submit" class="text-xs">
+                  Submit
+                </button>
+              </form>
+            </div>
+          </div>
+        </Portal>
+      </Show>
     </>
   );
 }

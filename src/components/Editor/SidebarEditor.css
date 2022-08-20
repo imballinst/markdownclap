@@ -1,11 +1,39 @@
-.sidebar-editor-result > table {
-  border-width: theme(borderWidth.2);
-  border-color: theme(borderColor.slate.500)
+.sidebar-editor table {
+  border-width: theme('borderWidth.2');
+  border-color: theme('borderColor.slate.500');
+  font-size: theme('fontSize.sm');
 }
 
-.sidebar-editor-result > table th,
-.sidebar-editor-result > table td {
-  padding: theme(spacing.1) theme(spacing.2);
-  border-width: theme(borderWidth.2);
-  border-color: theme(borderColor.slate.500)
+.sidebar-editor table th,
+.sidebar-editor table td {
+  border-width: theme('borderWidth.2');
+  border-color: theme('borderColor.slate.500');
+}
+
+.sidebar-editor table th input,
+.sidebar-editor table td input {
+  width: 100%;
+}
+
+.popover-root,
+.popover-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.popover-backdrop {
+  z-index: theme('zIndex.10');
+}
+
+.popover-dropdown {
+  position: absolute;
+  z-index: theme('zIndex.20');
+  padding: theme('spacing.2');
+  border-radius: theme('borderRadius.sm');
+  background: theme('backgroundColor.white');
+  box-shadow: theme('boxShadow.md');
+  outline: none;
 }

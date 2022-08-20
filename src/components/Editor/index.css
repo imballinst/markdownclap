@@ -10,6 +10,7 @@
 .editor-segment {
   flex: 1 1 auto;
   display: flex;
+  flex-basis: 50%;
   flex-direction: column;
 }
 
