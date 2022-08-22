@@ -46,11 +46,11 @@ export function alterColumn({
   switch (type) {
     case 'add': {
       newContent.headers = alterArray(newContent.headers, columnIdx, {
-        type: 'add',
+        type,
         element: action.content.header
       });
       newContent.separators = alterArray(newContent.separators, columnIdx, {
-        type: 'add',
+        type,
         element: action.content.separator
       });
 
@@ -65,10 +65,11 @@ export function alterColumn({
 
       newContent.rows = newContent.rows.map((rowColumns, index) =>
         alterArray(rowColumns, columnIdx, {
-          type: 'add',
+          type,
           element: action.content.columns[index]
         })
       );
+
       break;
     }
     case 'remove': {

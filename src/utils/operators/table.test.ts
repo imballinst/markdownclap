@@ -641,7 +641,7 @@ describe('getTableRawContent', () => {
 
 describe('alterColumn', () => {
   test('add', () => {
-    const content: ParsedTableResult['content'] = {
+    const initialContent: ParsedTableResult['content'] = {
       headers: [
         {
           content: 'Name',
@@ -664,7 +664,7 @@ describe('alterColumn', () => {
         }
       ])
     };
-    const alterContent = {
+    let alterContent = {
       header: {
         content: 'No.',
         post: '',
@@ -681,20 +681,52 @@ describe('alterColumn', () => {
         pre: ''
       }))
     };
-    const result = alterColumn({
-      content,
+    let expected: ParsedTableResult['content'] = {
+      headers: [alterContent.header, ...initialContent.headers],
+      separators: [alterContent.separator, ...initialContent.separators],
+      rows: initialContent.rows.map((columns, rowIdx) => [alterContent.columns[rowIdx], ...columns])
+    };
+    let result = alterColumn({
+      content: initialContent,
       action: {
         columnIdx: 0,
         content: alterContent,
         type: 'add'
       }
     });
+    expect(expected).toEqual(result);
 
-    const expected: ParsedTableResult['content'] = {
-      headers: [alterContent.header, ...content.headers],
-      separators: [alterContent.separator, ...content.separators],
-      rows: content.rows.map((columns, rowIdx) => [alterContent.columns[rowIdx], ...columns])
+    // Try adding one more.
+    alterContent = {
+      header: {
+        content: 'Score',
+        post: '',
+        pre: ''
+      },
+      separator: {
+        content: '-',
+        post: '',
+        pre: ''
+      },
+      columns: Array.from(new Array(5), (_) => ({
+        content: `${Math.random() * 100}`,
+        post: '',
+        pre: ''
+      }))
     };
+    expected = {
+      headers: [...result.headers, alterContent.header],
+      separators: [...result.separators, alterContent.separator],
+      rows: result.rows.map((columns, rowIdx) => [...columns, alterContent.columns[rowIdx]])
+    };
+    result = alterColumn({
+      content: result,
+      action: {
+        columnIdx: 2,
+        content: alterContent,
+        type: 'add'
+      }
+    });
     expect(expected).toEqual(result);
   });
 

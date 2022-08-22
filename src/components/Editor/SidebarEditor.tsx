@@ -1,8 +1,13 @@
 import { useStore } from '@nanostores/solid';
-import { createSignal, JSX, Show } from 'solid-js';
+import { createEffect, createSignal, JSX, Show } from 'solid-js';
 import { Portal } from 'solid-js/web';
-import { editorStore, updateSidebarTable } from '../../store/editor';
-import { getTableRawContent, ParsedColumn, ParsedTableResult } from '../../utils/operators/table';
+import { alterTable, ColumnContentType, editorStore, updateSidebarTable } from '../../store/editor';
+import {
+  getTableRawContent,
+  ParsedColumn,
+  ParsedStringResult,
+  ParsedTableResult
+} from '../../utils/operators/table';
 
 import './SidebarEditor.css';
 
@@ -24,37 +29,14 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
     return null;
   }
 
-  const editor = useStore(editorStore);
   const [content, setContent] = createSignal(result.content);
+  const editor = useStore(editorStore);
+  createEffect(() => {
+    const sidebarContent = editor().sidebarContent;
+    if (!sidebarContent) return;
 
-  function onSubmit(params: ColumnAction) {
-    switch (params.type) {
-      case 'fill-column': {
-        if (params.payload.columnContentType === 'ordered-number') {
-          let newRows = editor().sidebarContent?.content.rows || [];
-          newRows = newRows.map((columns, index) => {
-            const newColumns: ParsedColumn[] = [...columns];
-            newColumns[params.payload.columnIndex] = {
-              ...newColumns[params.payload.columnIndex],
-              content: `${index + 1}`
-            };
-            return newColumns;
-          });
-
-          const newContent = {
-            headers: editor().sidebarContent!.content.headers,
-            separators: editor().sidebarContent!.content.separators,
-            rows: newRows
-          };
-
-          updateSidebarTable({
-            content: newContent,
-            rawContent: getTableRawContent(newContent)
-          });
-        }
-      }
-    }
-  }
+    setContent(sidebarContent.content);
+  });
 
   return (
     <div>
@@ -74,7 +56,7 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
           <tr>
             {content().headers.map((_, index) => (
               <th>
-                <HeaderButton columnIndex={index} onSubmit={onSubmit} />
+                <HeaderButton columnIndex={index} />
               </th>
             ))}
           </tr>
@@ -135,15 +117,6 @@ interface PopoverStyleState {
   left: `${number}px`;
 }
 
-type ColumnContentType = 'ordered-number' | 'add-column-before';
-type ColumnAction = {
-  type: 'add-column-before' | 'add-column-after' | 'fill-column';
-  payload: {
-    columnIndex: number;
-    columnContentType: ColumnContentType;
-  };
-};
-
 type ColumnActionsType =
   | 'add-column-before'
   | 'add-column-after'
@@ -153,10 +126,9 @@ type ColumnActionsType =
 
 interface HeaderButtonProps {
   columnIndex: number;
-  onSubmit: (params: ColumnAction) => void;
 }
 
-export function HeaderButton({ onSubmit: onSubmitProp, columnIndex }: HeaderButtonProps) {
+export function HeaderButton({ columnIndex }: HeaderButtonProps) {
   const [popoverStyle, setPopoverStyle] = createSignal<PopoverStyleState>({
     left: '0px',
     top: '0px'
@@ -171,7 +143,7 @@ export function HeaderButton({ onSubmit: onSubmitProp, columnIndex }: HeaderButt
     const actionPayload = formData.get('actionPayload');
 
     if (type === 'add-column-after' || type === 'add-column-before' || type === 'fill-column') {
-      onSubmitProp({
+      alterTable({
         type,
         payload: {
           columnIndex,
@@ -272,4 +244,27 @@ export function HeaderButton({ onSubmit: onSubmitProp, columnIndex }: HeaderButt
       </Show>
     </>
   );
+}
+
+// Helper function.
+function getNewContent(
+  content: NonNullable<ParsedStringResult>['content'],
+  columnIndex: number,
+  getColumnContent: (rowIndex: number) => string
+): NonNullable<ParsedStringResult>['content'] {
+  let newRows = content.rows || [];
+  newRows = newRows.map((columns, index) => {
+    const newColumns: ParsedColumn[] = [...columns];
+    newColumns[columnIndex] = {
+      ...newColumns[columnIndex],
+      content: getColumnContent(index)
+    };
+    return newColumns;
+  });
+
+  return {
+    headers: content.headers,
+    separators: content.separators,
+    rows: newRows
+  };
 }

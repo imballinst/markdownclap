@@ -9,8 +9,6 @@ import { addHeading } from '../../utils/headings';
 import { ParsedStringResult, parseTableString } from '../../utils/operators/table';
 
 const DEFAULT_STRING = `
-Sample paragraph
-
 |No|Name|
 |-|-|
 |1|hehe|

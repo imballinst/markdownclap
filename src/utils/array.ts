@@ -1,3 +1,5 @@
+import { deepClone } from './object';
+
 export function alterArray<ElementType>(
   array: ElementType[],
   modifiedIndex: number,
@@ -17,13 +19,14 @@ export function alterArray<ElementType>(
   }
 
   // Add and remove.
-  let firstSegment = array.slice(0, modifiedIndex);
-  let secondSegment = array.slice(modifiedIndex);
+  const cloned = deepClone(array);
+  let firstSegment = cloned.slice(0, modifiedIndex);
+  let secondSegment = cloned.slice(modifiedIndex);
 
   if (action.type === 'remove') {
-    secondSegment.splice(0, 1);
+    secondSegment = secondSegment.slice(1);
   } else {
-    secondSegment.unshift(action.element);
+    secondSegment = [action.element].concat(secondSegment);
   }
 
   return firstSegment.concat(secondSegment);
