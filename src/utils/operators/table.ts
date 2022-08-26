@@ -36,7 +36,16 @@ export function alterColumn({
         };
       }
     | {
-        type: 'remove';
+        type: 'replace';
+        columnIdx: number;
+        content: {
+          header?: ParsedColumn;
+          separator?: ParsedColumn;
+          columns?: ParsedColumn[];
+        };
+      }
+    | {
+        type: 'delete';
         columnIdx: number;
       };
 }): ParsedTableResult['content'] {
@@ -72,7 +81,43 @@ export function alterColumn({
 
       break;
     }
-    case 'remove': {
+    case 'replace': {
+      if (action.content.header) {
+        newContent.headers = alterArray(newContent.headers, columnIdx, {
+          type,
+          element: action.content.header
+        });
+      }
+
+      if (action.content.separator) {
+        newContent.separators = alterArray(newContent.separators, columnIdx, {
+          type,
+          element: action.content.separator
+        });
+      }
+
+      const columns = action.content.columns;
+      if (columns) {
+        const rowsLength = newContent.rows.length;
+        const actionRowsLength = columns.length;
+
+        if (rowsLength !== actionRowsLength) {
+          throw new Error(
+            `The content rows\' length is not equal to \`action.content.columns\`. Expected ${rowsLength} but received ${actionRowsLength}.`
+          );
+        }
+
+        newContent.rows = newContent.rows.map((rowColumns, index) =>
+          alterArray(rowColumns, columnIdx, {
+            type,
+            element: columns[index]
+          })
+        );
+      }
+
+      break;
+    }
+    case 'delete': {
       newContent.headers = alterArray(newContent.headers, columnIdx, { type: 'remove' });
       newContent.separators = alterArray(newContent.separators, columnIdx, { type: 'remove' });
       newContent.rows = newContent.rows.map((rowColumns) =>

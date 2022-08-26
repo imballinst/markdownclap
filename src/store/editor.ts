@@ -36,13 +36,20 @@ export function updateSidebarTable(
 }
 
 export type ColumnContentType = 'ordered-number' | 'add-column-before';
-export type ColumnAction = {
-  type: 'add-column-before' | 'add-column-after' | 'fill-column';
-  payload: {
-    columnIndex: number;
-    columnContentType: ColumnContentType;
-  };
-};
+export type ColumnAction =
+  | {
+      type: 'add-column-before' | 'add-column-after' | 'fill-column';
+      payload: {
+        columnIndex: number;
+        columnContentType: ColumnContentType;
+      };
+    }
+  | {
+      type: 'delete-column';
+      payload: {
+        columnIndex: number;
+      };
+    };
 
 export function alterTable(params: ColumnAction) {
   const sidebarContent = editorStore.get().sidebarContent;
@@ -109,27 +116,38 @@ export function alterTable(params: ColumnAction) {
     }
     case 'fill-column': {
       if (params.payload.columnContentType === 'ordered-number') {
-        let newRows = sidebarContent.content.rows || [];
-        newRows = newRows.map((columns, index) => {
-          const newColumns: ParsedColumn[] = [...columns];
-          newColumns[params.payload.columnIndex] = {
-            ...newColumns[params.payload.columnIndex],
-            content: `${index + 1}`
-          };
-          return newColumns;
+        const newContent = alterColumn({
+          content: sidebarContent.content,
+          action: {
+            type: 'replace',
+            columnIdx: params.payload.columnIndex,
+            content: {
+              columns: sidebarContent.content.rows.map((columns, index) => {
+                const column = { ...columns[params.payload.columnIndex] };
+                column.content = `${index + 1}`;
+                return column;
+              })
+            }
+          }
         });
-
-        const newContent = {
-          headers: sidebarContent.content.headers,
-          separators: sidebarContent.content.separators,
-          rows: newRows
-        };
         updateSidebarTable({
           content: newContent
         });
       }
 
       break;
+    }
+    case 'delete-column': {
+      const newContent = alterColumn({
+        content: sidebarContent.content,
+        action: {
+          type: 'delete',
+          columnIdx: params.payload.columnIndex
+        }
+      });
+      updateSidebarTable({
+        content: newContent
+      });
     }
   }
 }

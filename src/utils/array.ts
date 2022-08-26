@@ -7,6 +7,7 @@ export function alterArray<ElementType>(
     | { type: 'remove' }
     | { type: 'add'; element: ElementType }
     | { type: 'move'; targetIndex: number }
+    | { type: 'replace'; element: ElementType }
 ) {
   if (action.type === 'move') {
     // Move.
@@ -25,6 +26,8 @@ export function alterArray<ElementType>(
 
   if (action.type === 'remove') {
     secondSegment = secondSegment.slice(1);
+  } else if (action.type === 'replace') {
+    secondSegment[0] = action.element;
   } else {
     secondSegment = [action.element].concat(secondSegment);
   }

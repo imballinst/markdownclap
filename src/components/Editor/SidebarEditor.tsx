@@ -150,6 +150,13 @@ export function HeaderButton({ columnIndex }: HeaderButtonProps) {
           columnContentType: actionPayload as ColumnContentType
         }
       });
+    } else if (type === 'delete-column') {
+      alterTable({
+        type,
+        payload: {
+          columnIndex
+        }
+      });
     }
   };
 
