@@ -56,7 +56,7 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
           <tr>
             {content().headers.map((_, index) => (
               <th>
-                <HeaderButton columnIndex={index} />
+                <HeaderButton columnIndex={index} columnsLength={content().headers.length} />
               </th>
             ))}
           </tr>
@@ -126,9 +126,10 @@ type ColumnActionsType =
 
 interface HeaderButtonProps {
   columnIndex: number;
+  columnsLength: number;
 }
 
-export function HeaderButton({ columnIndex }: HeaderButtonProps) {
+export function HeaderButton({ columnIndex, columnsLength }: HeaderButtonProps) {
   const [popoverStyle, setPopoverStyle] = createSignal<PopoverStyleState>({
     left: '0px',
     top: '0px'
@@ -142,21 +143,38 @@ export function HeaderButton({ columnIndex }: HeaderButtonProps) {
     const type = formData.get('type') as ColumnActionsType;
     const actionPayload = formData.get('actionPayload');
 
-    if (type === 'add-column-after' || type === 'add-column-before' || type === 'fill-column') {
-      alterTable({
-        type,
-        payload: {
-          columnIndex,
-          columnContentType: actionPayload as ColumnContentType
-        }
-      });
-    } else if (type === 'delete-column') {
-      alterTable({
-        type,
-        payload: {
-          columnIndex
-        }
-      });
+    switch (type) {
+      case 'add-column-after':
+      case 'add-column-before':
+      case 'fill-column': {
+        alterTable({
+          type,
+          payload: {
+            columnIndex,
+            columnContentType: actionPayload as ColumnContentType
+          }
+        });
+
+        break;
+      }
+      case 'move-column': {
+        // alterTable({
+        //   type,
+        //   payload: {
+        //     columnIndex,
+        //     columnContentType: actionPayload as ColumnContentType
+        //   }
+        // });
+        break;
+      }
+      case 'delete-column': {
+        alterTable({
+          type,
+          payload: {
+            columnIndex
+          }
+        });
+      }
     }
   };
 
@@ -202,14 +220,14 @@ export function HeaderButton({ columnIndex }: HeaderButtonProps) {
                     <option class="text-xs" value="add-column-after">
                       Add column after
                     </option>
-                    <option class="text-xs" value="delete-column">
-                      Delete column
-                    </option>
-                    <option class="text-xs" value="move-column">
-                      Move column
-                    </option>
                     <option class="text-xs" value="fill-column">
                       Fill column
+                    </option>
+                    <option class="text-xs" value="move-column" disabled={columnsLength === 1}>
+                      Move column
+                    </option>
+                    <option class="text-xs" value="delete-column" disabled={columnsLength === 1}>
+                      Delete column
                     </option>
                   </select>
                 </div>

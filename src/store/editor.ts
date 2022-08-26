@@ -45,6 +45,13 @@ export type ColumnAction =
       };
     }
   | {
+      type: 'move-column';
+      payload: {
+        columnIndex: number;
+        targetColumnIndex: number;
+      };
+    }
+  | {
       type: 'delete-column';
       payload: {
         columnIndex: number;
