@@ -6,21 +6,21 @@ export function alterArray<ElementType>(
   action:
     | { type: 'remove' }
     | { type: 'add'; element: ElementType }
-    | { type: 'move'; targetIndex: number }
+    | { type: 'swap'; targetIndex: number }
     | { type: 'replace'; element: ElementType }
 ) {
-  if (action.type === 'move') {
-    // Move.
-    const newArray = [...array];
-    const tmp = newArray[modifiedIndex];
-    newArray[modifiedIndex] = newArray[action.targetIndex];
-    newArray[action.targetIndex] = tmp;
+  const cloned = deepClone(array);
 
-    return newArray;
+  if (action.type === 'swap') {
+    // Move.
+    const tmp = cloned[modifiedIndex];
+    cloned[modifiedIndex] = cloned[action.targetIndex];
+    cloned[action.targetIndex] = tmp;
+
+    return cloned;
   }
 
   // Add and remove.
-  const cloned = deepClone(array);
   let firstSegment = cloned.slice(0, modifiedIndex);
   let secondSegment = cloned.slice(modifiedIndex);
 

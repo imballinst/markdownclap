@@ -1,11 +1,5 @@
 import { atom } from 'nanostores';
-import {
-  alterColumn,
-  getTableRawContent,
-  ParsedColumn,
-  ParsedStringResult,
-  ParsedTableResult
-} from '../utils/operators/table';
+import { alterColumn, ParsedStringResult, ParsedTableResult } from '../utils/operators/table';
 
 export interface EditorState {
   sidebarContent: ParsedStringResult;
@@ -45,7 +39,7 @@ export type ColumnAction =
       };
     }
   | {
-      type: 'move-column';
+      type: 'swap-column';
       payload: {
         columnIndex: number;
         targetColumnIndex: number;
@@ -141,6 +135,21 @@ export function alterTable(params: ColumnAction) {
           content: newContent
         });
       }
+
+      break;
+    }
+    case 'swap-column': {
+      const newContent = alterColumn({
+        content: sidebarContent.content,
+        action: {
+          type: 'swap',
+          columnIdx: params.payload.columnIndex,
+          targetColumnIndex: params.payload.targetColumnIndex
+        }
+      });
+      updateSidebarTable({
+        content: newContent
+      });
 
       break;
     }

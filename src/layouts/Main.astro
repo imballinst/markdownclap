@@ -1,13 +1,70 @@
 ---
-import EntryEditor from "../components/Editor/index";
+import EntryEditor from '../components/Editor/index';
 ---
 
 <main>
+  <h1 class="text-2xl text-center">Markdown Clap</h1>
+  <p class="text-gray-700 text-center italic">Editing Markdown becomes as easy as clapping</p>
+
   <EntryEditor client:visible />
 </main>
 
 <style>
   main {
     padding: 1rem;
+  }
+
+  :global(input),
+  :global(button),
+  :global(textarea),
+  :global(select) {
+    display: inline-flex;
+    justify-content: center;
+    border-width: theme('borderWidth.2');
+    border-color: transparent;
+    box-shadow: theme('boxShadow.sm');
+    font-weight: theme('fontWeight.medium');
+    border-radius: theme('borderRadius.md');
+  }
+
+  :global(input),
+  :global(select),
+  :global(textarea) {
+    padding: theme('spacing.1') theme('spacing.2');
+  }
+
+  :global(button) {
+    padding: theme('spacing.2') theme('spacing.4');
+  }
+
+  :global(input),
+  :global(button),
+  :global(select) {
+    font-size: theme('fontSize.sm');
+  }
+
+  :global(button),
+  :global(button[type='button']),
+  :global(button[type='submit']),
+  :global(button[type='reset']) {
+    padding: theme('spacing.2') theme('spacing.4');
+    color: theme('colors.white');
+    background: theme('colors.blue.600');
+  }
+
+  :global(button:hover) {
+    background: theme('colors.blue.700');
+  }
+
+  :global(button:focus) {
+    outline: none;
+    --tw-ring-color: theme('ringColor.blue.500');
+    --tw-ring-offset-width: theme('ringOffsetWidth.2');
+    --tw-ring-width: theme('ringWidth.2');
+  }
+
+  :global(textarea) {
+    border-width: theme('borderWidth.DEFAULT');
+    border-color: theme('borderColor.slate.100');
   }
 </style>

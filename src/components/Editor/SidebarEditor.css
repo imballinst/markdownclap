@@ -1,18 +1,27 @@
 .sidebar-editor table {
-  border-width: theme('borderWidth.2');
-  border-color: theme('borderColor.slate.500');
-  font-size: theme('fontSize.sm');
+  width: 100%;
+  margin-top: theme('spacing.4');
 }
 
 .sidebar-editor table th,
 .sidebar-editor table td {
-  border-width: theme('borderWidth.2');
-  border-color: theme('borderColor.slate.500');
+  padding: 0;
+}
+
+.sidebar-editor table th.action-header-column {
+  padding: theme('spacing.2');
 }
 
 .sidebar-editor table th input,
 .sidebar-editor table td input {
   width: 100%;
+  border-radius: theme('borderRadius.none');
+  border-color: theme('colors.slate.700');
+  border-width: theme('borderWidth.DEFAULT');
+}
+
+.sidebar-editor .header-button {
+  padding: theme('spacing.1') theme('spacing.2');
 }
 
 .popover-root,

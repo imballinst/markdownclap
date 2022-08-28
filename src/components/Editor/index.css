@@ -5,6 +5,7 @@
   gap: 1rem;
   position: relative;
   width: 100%;
+  margin-top: theme('spacing.4');
 }
 
 .editor-segment {
@@ -12,13 +13,4 @@
   display: flex;
   flex-basis: 50%;
   flex-direction: column;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  margin: 0;
 }

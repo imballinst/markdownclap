@@ -51,12 +51,12 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
         Save
       </button>
 
-      <table>
+      <table class="sidebar-table">
         <thead>
           <tr>
             {content().headers.map((_, index) => (
-              <th>
-                <HeaderButton columnIndex={index} columnsLength={content().headers.length} />
+              <th class="action-header-column">
+                <HeaderButton columnIndex={index} headers={content().headers} />
               </th>
             ))}
           </tr>
@@ -121,15 +121,15 @@ type ColumnActionsType =
   | 'add-column-before'
   | 'add-column-after'
   | 'delete-column'
-  | 'move-column'
+  | 'swap-column'
   | 'fill-column';
 
 interface HeaderButtonProps {
   columnIndex: number;
-  columnsLength: number;
+  headers: ParsedColumn[];
 }
 
-export function HeaderButton({ columnIndex, columnsLength }: HeaderButtonProps) {
+export function HeaderButton({ columnIndex, headers }: HeaderButtonProps) {
   const [popoverStyle, setPopoverStyle] = createSignal<PopoverStyleState>({
     left: '0px',
     top: '0px'
@@ -137,6 +137,7 @@ export function HeaderButton({ columnIndex, columnsLength }: HeaderButtonProps) 
   const [isPopoverShown, setIsPopoverShown] = createSignal(false);
   const [columnAction, setColumnAction] = createSignal<ColumnActionsType>('add-column-after');
 
+  const headersLength = headers.length;
   const onSubmit: JSX.DOMAttributes<HTMLFormElement>['onSubmit'] = (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -157,14 +158,15 @@ export function HeaderButton({ columnIndex, columnsLength }: HeaderButtonProps) 
 
         break;
       }
-      case 'move-column': {
-        // alterTable({
-        //   type,
-        //   payload: {
-        //     columnIndex,
-        //     columnContentType: actionPayload as ColumnContentType
-        //   }
-        // });
+      case 'swap-column': {
+        alterTable({
+          type,
+          payload: {
+            columnIndex,
+            targetColumnIndex: Number(actionPayload)
+          }
+        });
+
         break;
       }
       case 'delete-column': {
@@ -176,6 +178,8 @@ export function HeaderButton({ columnIndex, columnsLength }: HeaderButtonProps) 
         });
       }
     }
+
+    setIsPopoverShown(false);
   };
 
   // Implementation especially for the WAI-ARIA thingy is heavily inspired by https://mui.com/material-ui/react-popover/.
@@ -183,7 +187,7 @@ export function HeaderButton({ columnIndex, columnsLength }: HeaderButtonProps) 
     <>
       <button
         type="button"
-        class="text-xs"
+        class="header-button"
         onClick={(e) => {
           const rect = e.currentTarget.getBoundingClientRect();
           setPopoverStyle({ left: `${rect.left}px`, top: `${rect.top + rect.height}px` });
@@ -223,10 +227,10 @@ export function HeaderButton({ columnIndex, columnsLength }: HeaderButtonProps) 
                     <option class="text-xs" value="fill-column">
                       Fill column
                     </option>
-                    <option class="text-xs" value="move-column" disabled={columnsLength === 1}>
+                    <option class="text-xs" value="swap-column" disabled={headersLength === 1}>
                       Move column
                     </option>
-                    <option class="text-xs" value="delete-column" disabled={columnsLength === 1}>
+                    <option class="text-xs" value="delete-column" disabled={headersLength === 1}>
                       Delete column
                     </option>
                   </select>
@@ -252,10 +256,22 @@ export function HeaderButton({ columnIndex, columnsLength }: HeaderButtonProps) 
                   </div>
                 </Show>
 
-                <Show when={columnAction() === 'move-column'}>
+                <Show when={columnAction() === 'swap-column'}>
                   <div class="flex flex-col">
-                    <label class="text-xs">Column number</label>
-                    <input name="actionPayload" type="text" />
+                    <label class="text-xs">Column to swap</label>
+                    <select class="text-xs" name="actionPayload">
+                      {headers.map((header, headerIdx) => {
+                        if (headerIdx === columnIndex) {
+                          return null;
+                        }
+
+                        return (
+                          <option class="text-xs" value={headerIdx}>
+                            {header.content.trim()}
+                          </option>
+                        );
+                      })}
+                    </select>
                   </div>
                 </Show>
 

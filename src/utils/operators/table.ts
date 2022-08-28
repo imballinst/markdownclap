@@ -45,6 +45,11 @@ export function alterColumn({
         };
       }
     | {
+        type: 'swap';
+        columnIdx: number;
+        targetColumnIndex: number;
+      }
+    | {
         type: 'delete';
         columnIdx: number;
       };
@@ -114,6 +119,21 @@ export function alterColumn({
           })
         );
       }
+
+      break;
+    }
+    case 'swap': {
+      newContent.headers = alterArray(newContent.headers, columnIdx, {
+        type: 'swap',
+        targetIndex: action.targetColumnIndex
+      });
+      newContent.separators = alterArray(newContent.separators, columnIdx, {
+        type: 'swap',
+        targetIndex: action.targetColumnIndex
+      });
+      newContent.rows = newContent.rows.map((rowColumns) =>
+        alterArray(rowColumns, columnIdx, { type: 'swap', targetIndex: action.targetColumnIndex })
+      );
 
       break;
     }

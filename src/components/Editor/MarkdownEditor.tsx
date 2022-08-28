@@ -9,19 +9,19 @@ import { addHeading } from '../../utils/headings';
 import { ParsedStringResult, parseTableString } from '../../utils/operators/table';
 
 const DEFAULT_STRING = `
-|No|Name|
-|-|-|
-|1|hehe|
-|2|hehe|
-|3|hehe|
-|4|hehe|
-|5|hehe|
-|6|hehe|
-|7|hehe|
-|8|hehe|
-|9|hehe|
-|10|hehe|
-|11|hehe|
+|No|Name|Description|
+|-|-|-|
+|1|hehe|this is a sample description 1|
+|2|hehe|this is a sample description 2|
+|3|hehe|this is a sample description 3|
+|4|hehe|this is a sample description 4|
+|5|hehe|this is a sample description 5|
+|6|hehe|this is a sample description 6|
+|7|hehe|this is a sample description 7|
+|8|hehe|this is a sample description 8|
+|9|hehe|this is a sample description 9|
+|10|hehe|this is a sample description 10|
+|11|hehe|this is a sample description 11|
 
 Sample paragraph
 `.trim();
@@ -92,36 +92,39 @@ export const MarkdownEditor = () => {
 
   return (
     <>
-      <button
-        onClick={() => {
-          const { sidebarContent } = editor();
-          let effectiveValue = markdown();
-          let parseResult: ParsedStringResult = undefined;
+      <div>
+        <button
+          type="button"
+          onClick={() => {
+            const { sidebarContent } = editor();
+            let effectiveValue = markdown();
+            let parseResult: ParsedStringResult = undefined;
 
-          if (textareaElement) {
-            const { selectionStart, selectionEnd } = textareaElement;
+            if (textareaElement) {
+              const { selectionStart, selectionEnd } = textareaElement;
 
-            effectiveValue = effectiveValue.slice(selectionStart, selectionEnd);
-            parseResult = parseTableString(effectiveValue);
+              effectiveValue = effectiveValue.slice(selectionStart, selectionEnd);
+              parseResult = parseTableString(effectiveValue);
 
-            // Save the last selected text.
-            if (parseResult !== undefined) {
-              setSelected([selectionStart, selectionEnd]);
+              // Save the last selected text.
+              if (parseResult !== undefined) {
+                setSelected([selectionStart, selectionEnd]);
+              }
+
+              // Remove the currently selected element.
+              textareaElement.setSelectionRange(0, 0);
             }
 
-            // Remove the currently selected element.
-            textareaElement.setSelectionRange(0, 0);
-          }
-
-          if (sidebarContent !== undefined) {
-            closeEditorSidebar();
-          } else if (parseResult?.type === 'table') {
-            openEditorSidebar(parseResult);
-          }
-        }}
-      >
-        Open in sidebar
-      </button>
+            if (sidebarContent !== undefined) {
+              closeEditorSidebar();
+            } else if (parseResult?.type === 'table') {
+              openEditorSidebar(parseResult);
+            }
+          }}
+        >
+          Inspect selection
+        </button>
+      </div>
       <textarea
         ref={textareaElement}
         class="markdown-editor"
@@ -131,7 +134,7 @@ export const MarkdownEditor = () => {
           setMarkdown(e.currentTarget.value ?? '');
         }}
       />
-      <pre innerHTML={marked(markdown())} />
+      <pre class="markdown-result" innerHTML={marked(markdown())} />
     </>
   );
 };
