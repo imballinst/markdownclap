@@ -3,10 +3,10 @@ import { useStore } from '@nanostores/solid';
 import { MarkdownEditor } from './MarkdownEditor';
 import { SidebarEditor } from './SidebarEditor';
 import './index.css';
-import { editorStore } from '../../store/editor';
+import { drawerStatusStore } from '../../store/drawer';
 
 export default function EntryEditor() {
-  const editor = useStore(editorStore);
+  const isDrawerOpen = useStore(drawerStatusStore);
 
   return (
     <div class="editor">
@@ -16,7 +16,7 @@ export default function EntryEditor() {
       <div
         class="editor-segment"
         style={{
-          display: editor().sidebarContent !== undefined ? 'flex' : 'none'
+          display: isDrawerOpen() ? 'flex' : 'none'
         }}
       >
         <SidebarEditor />

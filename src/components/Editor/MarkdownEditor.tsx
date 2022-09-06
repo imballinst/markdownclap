@@ -1,7 +1,7 @@
 import { createEffect, createSignal, JSX } from 'solid-js';
 import { marked } from 'marked';
 
-import { closeEditorSidebar, editorStore, openEditorSidebar } from '../../store/editor';
+import { setIsDrawerOpen, drawerContentStore, setDrawerContent } from '../../store/drawer';
 import './MarkdownEditor.css';
 import { useStore } from '@nanostores/solid';
 import { isKeycodeNumber } from '../../utils/key-parser';
@@ -29,11 +29,11 @@ Sample paragraph
 export const MarkdownEditor = () => {
   const [markdown, setMarkdown] = createSignal(DEFAULT_STRING);
   const [selected, setSelected] = createSignal([0, 0]);
-  const editor = useStore(editorStore);
+  const editor = useStore(drawerContentStore);
   let textareaElement: HTMLTextAreaElement | undefined;
 
   createEffect<string | undefined>((previous) => {
-    const rawContent = editor().sidebarContent?.rawContent;
+    const rawContent = editor()?.rawContent;
 
     if (previous !== undefined && rawContent !== undefined && previous !== rawContent) {
       const [start, end] = selected();
@@ -46,7 +46,7 @@ export const MarkdownEditor = () => {
     }
 
     return rawContent;
-  }, editor().sidebarContent?.rawContent);
+  }, editor()?.rawContent);
 
   const onKeyDown: JSX.TextareaHTMLAttributes<HTMLTextAreaElement>['onKeyDown'] = (e) => {
     if (e.code === 'Tab') {
@@ -96,7 +96,7 @@ export const MarkdownEditor = () => {
         <button
           type="button"
           onClick={() => {
-            const { sidebarContent } = editor();
+            const sidebarContent = editor();
             let effectiveValue = markdown();
             let parseResult: ParsedStringResult = undefined;
 
@@ -115,11 +115,11 @@ export const MarkdownEditor = () => {
               textareaElement.setSelectionRange(0, 0);
             }
 
-            if (sidebarContent !== undefined) {
-              closeEditorSidebar();
-            } else if (parseResult?.type === 'table') {
-              openEditorSidebar(parseResult);
+            if (parseResult?.type === 'table') {
+              setDrawerContent(parseResult);
             }
+
+            setIsDrawerOpen(parseResult !== undefined);
           }}
         >
           Inspect selection

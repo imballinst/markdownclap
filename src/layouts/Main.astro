@@ -43,6 +43,17 @@ import EntryEditor from '../components/Editor/index';
     font-size: theme('fontSize.sm');
   }
 
+  :global(select) {
+    cursor: theme('cursor.pointer');
+    background: transparent;
+    border-color: theme('borderColor.slate.100');
+    border-width: 1px;
+  }
+
+  :global(select):hover {
+    background: theme('colors.blue.50');
+  }
+
   :global(button),
   :global(button[type='button']),
   :global(button[type='submit']),

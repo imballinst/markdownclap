@@ -1,7 +1,13 @@
 import { useStore } from '@nanostores/solid';
 import { createEffect, createSignal, JSX, Show } from 'solid-js';
 import { Portal } from 'solid-js/web';
-import { alterTable, ColumnContentType, editorStore, updateSidebarTable } from '../../store/editor';
+import {
+  alterTable,
+  ColumnContentType,
+  drawerContentStore,
+  patchDrawerContent,
+  setIsDrawerOpen
+} from '../../store/drawer';
 import {
   getTableRawContent,
   ParsedColumn,
@@ -11,13 +17,18 @@ import {
 
 import './SidebarEditor.css';
 
+const ARROW_UP_KEY = 'ArrowUp';
+const ARROW_DOWN_KEY = 'ArrowDown';
+const ARROW_LEFT_KEY = 'ArrowLeft';
+const ARROW_RIGHT_KEY = 'ArrowRight';
+
 export function SidebarEditor() {
-  const editor = useStore(editorStore);
+  const editor = useStore(drawerContentStore);
 
   return (
     <div class="sidebar-editor">
-      <Show when={editor().sidebarContent !== undefined}>
-        <Table result={editor().sidebarContent} />
+      <Show when={editor() !== undefined}>
+        <Table result={editor()} />
       </Show>
     </div>
   );
@@ -30,22 +41,81 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
   }
 
   const [content, setContent] = createSignal(result.content);
-  const editor = useStore(editorStore);
+  const editor = useStore(drawerContentStore);
   createEffect(() => {
-    const sidebarContent = editor().sidebarContent;
+    const sidebarContent = editor();
     if (!sidebarContent) return;
 
     setContent(sidebarContent.content);
   });
 
+  function onArrowKeyPress(elementId: string, code: string) {
+    let [row, col] = elementId
+      .slice('grid-cell-'.length)
+      .split('-')
+      .map((str) => Number(str));
+
+    if (code === ARROW_UP_KEY) {
+      row--;
+    } else if (code === ARROW_DOWN_KEY) {
+      row++;
+    } else if (code === ARROW_LEFT_KEY) {
+      col--;
+    } else if (code === ARROW_RIGHT_KEY) {
+      col++;
+    }
+
+    const nextElement = document.getElementById(
+      `grid-cell-${row}-${col}`
+    ) as HTMLInputElement | null;
+    if (nextElement) {
+      nextElement.focus();
+    }
+  }
+
+  let arrowInterval: number;
+  let arrowTimeout: number;
+  const onInputKeyDown: JSX.EventHandlerUnion<HTMLInputElement, KeyboardEvent> = (e) => {
+    if (
+      (e.currentTarget.selectionStart === 0 &&
+        (e.code === ARROW_UP_KEY || e.code === ARROW_LEFT_KEY)) ||
+      (e.currentTarget.selectionStart === e.currentTarget.value.length &&
+        (e.code === ARROW_DOWN_KEY || e.code === ARROW_RIGHT_KEY))
+      // (e.currentTarget.selectionStart === 0 ||
+      //   e.currentTarget.selectionStart === e.currentTarget.value.length) &&
+      // ARROW_KEYS.includes(e.code)
+    ) {
+      e.preventDefault();
+
+      clearTimeout(arrowTimeout);
+      clearInterval(arrowInterval);
+
+      onArrowKeyPress(e.currentTarget.id, e.code);
+
+      arrowTimeout = window.setTimeout(() => {
+        arrowInterval = window.setInterval(() => {
+          if (document.activeElement?.id.startsWith('grid-cell-')) {
+            onArrowKeyPress(document.activeElement.id, e.code);
+          }
+        }, 250);
+      }, 1000);
+    }
+  };
+
+  const onInputKeyUp: JSX.EventHandlerUnion<HTMLInputElement, KeyboardEvent> = (e) => {
+    clearTimeout(arrowTimeout);
+    clearInterval(arrowInterval);
+  };
+
   return (
     <div>
       <button
         onClick={() => {
-          updateSidebarTable({
+          patchDrawerContent({
             content: content(),
             rawContent: getTableRawContent(content())
           });
+          setIsDrawerOpen(false);
         }}
       >
         Save
@@ -65,6 +135,9 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
               <th>
                 <input
                   value={header.content}
+                  id={`grid-cell-0-${index}`}
+                  onKeyDown={onInputKeyDown}
+                  onKeyUp={onInputKeyUp}
                   onChange={(e) => {
                     setContent((prev) => {
                       const newHeaders = [...prev.headers];
@@ -87,6 +160,9 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
               <td>
                 <input
                   value={column.content}
+                  id={`grid-cell-${rowIndex + 1}-${columnIndex}`}
+                  onKeyDown={onInputKeyDown}
+                  onKeyUp={onInputKeyUp}
                   onChange={(e) => {
                     setContent((prev) => {
                       const newRows = [...prev.rows];
@@ -187,7 +263,7 @@ export function HeaderButton({ columnIndex, headers }: HeaderButtonProps) {
     <>
       <button
         type="button"
-        class="header-button"
+        class="secondary-button"
         onClick={(e) => {
           const rect = e.currentTarget.getBoundingClientRect();
           setPopoverStyle({ left: `${rect.left}px`, top: `${rect.top + rect.height}px` });
@@ -209,11 +285,14 @@ export function HeaderButton({ columnIndex, headers }: HeaderButtonProps) {
             />
             <div tabIndex={-1} class="popover-dropdown" style={popoverStyle()}>
               <form onSubmit={onSubmit}>
-                <div class="flex flex-col">
-                  <label class="text-xs">Select column action</label>
+                <div class="flex flex-col mb-2">
+                  <label for="popoverColumnAction" class="text-xs">
+                    Select column action
+                  </label>
                   <select
                     class="text-xs"
                     name="type"
+                    id="popoverColumnAction"
                     onInput={(e) => {
                       setColumnAction(e.currentTarget.value as ColumnActionsType);
                     }}
@@ -243,9 +322,11 @@ export function HeaderButton({ columnIndex, headers }: HeaderButtonProps) {
                     columnAction() === 'fill-column'
                   }
                 >
-                  <div class="flex flex-col">
-                    <label class="text-xs">Column type</label>
-                    <select name="actionPayload" class="text-xs">
+                  <div class="flex flex-col mb-2">
+                    <label for="popoverColumnOperationPayload" class="text-xs">
+                      Column type
+                    </label>
+                    <select id="popoverColumnOperationPayload" name="actionPayload" class="text-xs">
                       <option class="text-xs" value="ordered-number">
                         Ordered number
                       </option>
@@ -257,9 +338,11 @@ export function HeaderButton({ columnIndex, headers }: HeaderButtonProps) {
                 </Show>
 
                 <Show when={columnAction() === 'swap-column'}>
-                  <div class="flex flex-col">
-                    <label class="text-xs">Column to swap</label>
-                    <select class="text-xs" name="actionPayload">
+                  <div class="flex flex-col mb-2">
+                    <label for="popoverSwapPayload" class="text-xs">
+                      Column to swap
+                    </label>
+                    <select id="popoverSwapPayload" class="text-xs" name="actionPayload">
                       {headers.map((header, headerIdx) => {
                         if (headerIdx === columnIndex) {
                           return null;
@@ -275,7 +358,7 @@ export function HeaderButton({ columnIndex, headers }: HeaderButtonProps) {
                   </div>
                 </Show>
 
-                <button type="submit" class="text-xs">
+                <button type="submit" class="secondary-button text-xs">
                   Submit
                 </button>
               </form>

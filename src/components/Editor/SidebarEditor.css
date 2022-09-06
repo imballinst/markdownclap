@@ -3,25 +3,44 @@
   margin-top: theme('spacing.4');
 }
 
-.sidebar-editor table th,
-.sidebar-editor table td {
-  padding: 0;
+.sidebar-editor table th.action-header-column {
+  padding: theme('spacing.2') 0;
+  text-align: right;
 }
 
-.sidebar-editor table th.action-header-column {
-  padding: theme('spacing.2');
+.sidebar-editor table th,
+.sidebar-editor table td {
+  padding: theme('spacing[0.5]');
+}
+
+.sidebar-editor table th input {
+  font-weight: theme('fontWeight.bold');
 }
 
 .sidebar-editor table th input,
 .sidebar-editor table td input {
   width: 100%;
   border-radius: theme('borderRadius.none');
-  border-color: theme('colors.slate.700');
+  border-color: theme('colors.slate.200');
   border-width: theme('borderWidth.DEFAULT');
 }
 
-.sidebar-editor .header-button {
+.sidebar-editor .secondary-button,
+.popover-dropdown .secondary-button {
   padding: theme('spacing.1') theme('spacing.2');
+  background: none;
+  color: theme('colors.blue.500');
+  border-color: theme('colors.blue.500');
+  border-width: 1px;
+}
+
+.popover-dropdown .secondary-button {
+  margin-top: theme('spacing.2');
+}
+
+.sidebar-editor .secondary-button:hover,
+.popover-dropdown .secondary-button:hover {
+  background: theme('colors.blue.50');
 }
 
 .popover-root,

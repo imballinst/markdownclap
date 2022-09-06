@@ -1,32 +1,31 @@
 import { atom } from 'nanostores';
 import { alterColumn, ParsedStringResult, ParsedTableResult } from '../utils/operators/table';
 
-export interface EditorState {
-  sidebarContent: ParsedStringResult;
+// Drawer status.
+export const drawerStatusStore = atom<boolean>(false);
+
+export function setIsDrawerOpen(isOpen: boolean) {
+  drawerStatusStore.set(isOpen);
 }
 
-export const editorStore = atom<EditorState>({
-  sidebarContent: undefined
-});
+// Drawer content.
+export type DrawerContent = ParsedStringResult;
+export const drawerContentStore = atom<DrawerContent>(undefined);
 
-export function openEditorSidebar(sidebarContent: EditorState['sidebarContent']) {
-  editorStore.set({ sidebarContent });
+export function setDrawerContent(sidebarContent: DrawerContent) {
+  drawerContentStore.set(sidebarContent);
 }
 
-export function closeEditorSidebar() {
-  editorStore.set({ sidebarContent: undefined });
-}
-
-export function updateSidebarTable(
-  sidebarContent: Omit<Partial<NonNullable<ParsedStringResult>>, 'type'>
+export function patchDrawerContent(
+  sidebarContent: Omit<Partial<NonNullable<DrawerContent>>, 'type'>
 ) {
-  const oldSidebarContent = editorStore.get().sidebarContent;
+  const oldSidebarContent = drawerContentStore.get();
   if (oldSidebarContent === undefined) return;
 
   const newSidebarContent: ParsedTableResult = { ...oldSidebarContent };
   newSidebarContent.content = sidebarContent.content || oldSidebarContent.content;
   newSidebarContent.rawContent = sidebarContent.rawContent || oldSidebarContent.rawContent;
-  editorStore.set({ sidebarContent: newSidebarContent });
+  drawerContentStore.set(newSidebarContent);
 }
 
 export type ColumnContentType = 'ordered-number' | 'add-column-before';
@@ -53,7 +52,7 @@ export type ColumnAction =
     };
 
 export function alterTable(params: ColumnAction) {
-  const sidebarContent = editorStore.get().sidebarContent;
+  const sidebarContent = drawerContentStore.get();
   if (!sidebarContent) return;
 
   switch (params.type) {
@@ -79,7 +78,7 @@ export function alterTable(params: ColumnAction) {
             }
           }
         });
-        updateSidebarTable({
+        patchDrawerContent({
           content: newContent
         });
       }
@@ -108,7 +107,7 @@ export function alterTable(params: ColumnAction) {
             }
           }
         });
-        updateSidebarTable({
+        patchDrawerContent({
           content: newContent
         });
       }
@@ -131,7 +130,7 @@ export function alterTable(params: ColumnAction) {
             }
           }
         });
-        updateSidebarTable({
+        patchDrawerContent({
           content: newContent
         });
       }
@@ -147,7 +146,7 @@ export function alterTable(params: ColumnAction) {
           targetColumnIndex: params.payload.targetColumnIndex
         }
       });
-      updateSidebarTable({
+      patchDrawerContent({
         content: newContent
       });
 
@@ -161,7 +160,7 @@ export function alterTable(params: ColumnAction) {
           columnIdx: params.payload.columnIndex
         }
       });
-      updateSidebarTable({
+      patchDrawerContent({
         content: newContent
       });
     }
