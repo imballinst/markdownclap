@@ -81,9 +81,6 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
         (e.code === ARROW_UP_KEY || e.code === ARROW_LEFT_KEY)) ||
       (e.currentTarget.selectionStart === e.currentTarget.value.length &&
         (e.code === ARROW_DOWN_KEY || e.code === ARROW_RIGHT_KEY))
-      // (e.currentTarget.selectionStart === 0 ||
-      //   e.currentTarget.selectionStart === e.currentTarget.value.length) &&
-      // ARROW_KEYS.includes(e.code)
     ) {
       e.preventDefault();
 

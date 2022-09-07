@@ -5,14 +5,22 @@
   margin-top: theme('spacing.4');
 }
 
+.markdown-editor {
+  border-radius: 0;
+}
+
 .markdown-result {
   margin-top: theme('spacing.4');
 }
 
+.markdown-result table {
+  width: 100%;
+}
+
 .markdown-result th,
 .markdown-result td {
-  border-width: theme('borderWidth.DEFAULT');
-  border-color: theme('borderColor.slate.200');
+  border-width: theme('borderWidth.2');
+  border-color: theme('borderColor.slate.100');
   padding: theme('spacing.1') theme('spacing.4');
   font-size: theme('fontSize.sm');
 }

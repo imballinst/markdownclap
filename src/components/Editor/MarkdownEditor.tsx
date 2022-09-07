@@ -1,5 +1,4 @@
-import { createEffect, createSignal, JSX } from 'solid-js';
-import { marked } from 'marked';
+import { Accessor, createEffect, createSignal, JSX, Setter } from 'solid-js';
 
 import { setIsDrawerOpen, drawerContentStore, setDrawerContent } from '../../store/drawer';
 import './MarkdownEditor.css';
@@ -8,26 +7,12 @@ import { isKeycodeNumber } from '../../utils/key-parser';
 import { addHeading } from '../../utils/headings';
 import { ParsedStringResult, parseTableString } from '../../utils/operators/table';
 
-const DEFAULT_STRING = `
-|No|Name|Description|
-|-|-|-|
-|1|hehe|this is a sample description 1|
-|2|hehe|this is a sample description 2|
-|3|hehe|this is a sample description 3|
-|4|hehe|this is a sample description 4|
-|5|hehe|this is a sample description 5|
-|6|hehe|this is a sample description 6|
-|7|hehe|this is a sample description 7|
-|8|hehe|this is a sample description 8|
-|9|hehe|this is a sample description 9|
-|10|hehe|this is a sample description 10|
-|11|hehe|this is a sample description 11|
+interface MarkdownEditorProps {
+  markdown: Accessor<string>;
+  setMarkdown: Setter<string>;
+}
 
-Sample paragraph
-`.trim();
-
-export const MarkdownEditor = () => {
-  const [markdown, setMarkdown] = createSignal(DEFAULT_STRING);
+export const MarkdownEditor = ({ markdown, setMarkdown }: MarkdownEditorProps) => {
   const [selected, setSelected] = createSignal([0, 0]);
   const editor = useStore(drawerContentStore);
   let textareaElement: HTMLTextAreaElement | undefined;
@@ -96,7 +81,6 @@ export const MarkdownEditor = () => {
         <button
           type="button"
           onClick={() => {
-            const sidebarContent = editor();
             let effectiveValue = markdown();
             let parseResult: ParsedStringResult = undefined;
 
@@ -134,7 +118,6 @@ export const MarkdownEditor = () => {
           setMarkdown(e.currentTarget.value ?? '');
         }}
       />
-      <pre class="markdown-result" innerHTML={marked(markdown())} />
     </>
   );
 };
