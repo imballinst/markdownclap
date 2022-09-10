@@ -1,32 +1,36 @@
-import { Accessor, createEffect, createSignal, JSX, Setter } from 'solid-js';
+import { createEffect, createSignal, JSX } from 'solid-js';
 
-import { setIsDrawerOpen, drawerContentStore, setDrawerContent } from '../../store/drawer';
+import {
+  inspectContentStore,
+  InspectStatus,
+  setInspectContent,
+  setInspectStatus
+} from '../../store/inspect';
 import './MarkdownEditor.css';
 import { useStore } from '@nanostores/solid';
 import { isKeycodeNumber } from '../../utils/key-parser';
 import { addHeading } from '../../utils/headings';
 import { ParsedStringResult, parseTableString } from '../../utils/operators/table';
+import { markdownStore, setMarkdown } from '../../store/markdown';
 
-interface MarkdownEditorProps {
-  markdown: Accessor<string>;
-  setMarkdown: Setter<string>;
-}
+export const MarkdownEditor = () => {
+  const markdown = useStore(markdownStore);
 
-export const MarkdownEditor = ({ markdown, setMarkdown }: MarkdownEditorProps) => {
-  const [selected, setSelected] = createSignal([0, 0]);
-  const editor = useStore(drawerContentStore);
+  const [selected, setSelected] = createSignal<[number, number] | undefined>(undefined);
+  const [prevSelected, setPrevSelected] = createSignal<[number, number] | undefined>(undefined);
+  const editor = useStore(inspectContentStore);
+
   let textareaElement: HTMLTextAreaElement | undefined;
 
   createEffect<string | undefined>((previous) => {
     const rawContent = editor()?.rawContent;
 
     if (previous !== undefined && rawContent !== undefined && previous !== rawContent) {
-      const [start, end] = selected();
-      const selectedLength = end - start;
-      const rawContentLength = rawContent.length;
-      const diff = rawContentLength - selectedLength;
+      const value = prevSelected();
+      if (!value) return;
 
-      setSelected([start, end + diff]);
+      const [start, end] = value;
+      setPrevSelected(undefined);
       setMarkdown(markdown().slice(0, start).concat(rawContent).concat(markdown().slice(end)));
     }
 
@@ -76,10 +80,12 @@ export const MarkdownEditor = ({ markdown, setMarkdown }: MarkdownEditorProps) =
   };
 
   return (
-    <>
-      <div>
+    <div class="flex flex-col mt-4">
+      <div class="flex justify-end">
         <button
           type="button"
+          class="button-sm"
+          disabled={selected() === undefined}
           onClick={() => {
             let effectiveValue = markdown();
             let parseResult: ParsedStringResult = undefined;
@@ -90,20 +96,17 @@ export const MarkdownEditor = ({ markdown, setMarkdown }: MarkdownEditorProps) =
               effectiveValue = effectiveValue.slice(selectionStart, selectionEnd);
               parseResult = parseTableString(effectiveValue);
 
-              // Save the last selected text.
-              if (parseResult !== undefined) {
-                setSelected([selectionStart, selectionEnd]);
-              }
-
               // Remove the currently selected element.
               textareaElement.setSelectionRange(0, 0);
             }
 
             if (parseResult?.type === 'table') {
-              setDrawerContent(parseResult);
+              setInspectContent(parseResult);
             }
 
-            setIsDrawerOpen(parseResult !== undefined);
+            setInspectStatus(InspectStatus.InspectingSnippet);
+            setPrevSelected(selected());
+            setSelected(undefined);
           }}
         >
           Inspect selection
@@ -114,10 +117,18 @@ export const MarkdownEditor = ({ markdown, setMarkdown }: MarkdownEditorProps) =
         class="markdown-editor"
         value={markdown()}
         onKeyDown={onKeyDown}
+        onSelect={(e) => {
+          const { selectionStart, selectionEnd } = e.currentTarget;
+          if (selectionStart + selectionEnd === 0) {
+            setSelected(undefined);
+          } else {
+            setSelected([selectionStart, selectionEnd]);
+          }
+        }}
         onInput={(e) => {
           setMarkdown(e.currentTarget.value ?? '');
         }}
       />
-    </>
+    </div>
   );
 };

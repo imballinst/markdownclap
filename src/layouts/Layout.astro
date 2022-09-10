@@ -1,6 +1,8 @@
 ---
+import { Link } from '../components/Link/Link';
+
 export interface Props {
-	title: string;
+  title: string;
 }
 
 const { title } = Astro.props as Props;
@@ -8,13 +10,114 @@ const { title } = Astro.props as Props;
 
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
-		<title>{title}</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>{title}</title>
+  </head>
+  <body class="h-screen flex flex-col bg-slate-100">
+    <div class="px-4 py-2 bg-sky-100">
+      <h1 class="text-2xl inline-flex">Markdown👏</h1>
+    </div>
+
+    <main class="flex-1">
+      <slot />
+    </main>
+
+    <footer class="py-2 text-xs text-center bg-sky-100">
+      If you have feedback for this site, please let me know on my
+      <Link href="https://twitter.com/Ajiballinst">Twitter</Link>. Thanks!
+    </footer>
+    <style>
+      html,
+      body {
+        font-family: 'Poppins', sans-serif;
+      }
+
+      :global(input),
+      :global(button),
+      :global(textarea),
+      :global(select) {
+        display: inline-flex;
+        justify-content: center;
+        border-width: theme('borderWidth.2');
+        border-color: transparent;
+        box-shadow: theme('boxShadow.sm');
+        font-weight: theme('fontWeight.medium');
+        border-radius: theme('borderRadius.md');
+      }
+
+      :global(input),
+      :global(select),
+      :global(textarea) {
+        padding: theme('spacing.1') theme('spacing.2');
+      }
+
+      :global(button) {
+        padding: theme('spacing.2') theme('spacing.4');
+      }
+
+      :global(input),
+      :global(button),
+      :global(select) {
+        font-size: theme('fontSize.sm');
+      }
+
+      :global(select) {
+        cursor: theme('cursor.pointer');
+        background: transparent;
+        border-color: theme('borderColor.slate.100');
+        border-width: 1px;
+      }
+
+      :global(select):hover {
+        background: theme('colors.blue.50');
+      }
+
+      :global(button),
+      :global(button[type='button']),
+      :global(button[type='submit']),
+      :global(button[type='reset']) {
+        padding: theme('spacing.2') theme('spacing.4');
+        color: theme('colors.white');
+        background: theme('colors.blue.600');
+      }
+
+      :global(button:hover) {
+        background: theme('colors.blue.700');
+      }
+
+      :global(button:focus) {
+        outline: none;
+        --tw-ring-color: theme('ringColor.blue.500');
+        --tw-ring-offset-width: theme('ringOffsetWidth.2');
+        --tw-ring-width: theme('ringWidth.2');
+      }
+
+      :global(textarea) {
+        border-width: theme('borderWidth.DEFAULT');
+        border-color: theme('borderColor.slate.100');
+        font-family: monospace;
+      }
+
+      :global(button.button-sm) {
+        padding: theme('spacing.1') theme('spacing.2');
+        border-width: 1px;
+      }
+
+      :global(button:disabled) {
+        background: theme('colors.slate.400');
+        color: theme('colors.slate.200');
+      }
+    </style>
+  </body>
 </html>

@@ -4,10 +4,11 @@ import { Portal } from 'solid-js/web';
 import {
   alterTable,
   ColumnContentType,
-  drawerContentStore,
-  patchDrawerContent,
-  setIsDrawerOpen
-} from '../../store/drawer';
+  inspectContentStore,
+  InspectStatus,
+  patchInspectContent,
+  setInspectStatus
+} from '../../store/inspect';
 import {
   getTableRawContent,
   ParsedColumn,
@@ -15,15 +16,15 @@ import {
   ParsedTableResult
 } from '../../utils/operators/table';
 
-import './SidebarEditor.css';
+import './Drawer.css';
 
 const ARROW_UP_KEY = 'ArrowUp';
 const ARROW_DOWN_KEY = 'ArrowDown';
 const ARROW_LEFT_KEY = 'ArrowLeft';
 const ARROW_RIGHT_KEY = 'ArrowRight';
 
-export function SidebarEditor() {
-  const editor = useStore(drawerContentStore);
+export function Drawer() {
+  const editor = useStore(inspectContentStore);
 
   return (
     <div class="sidebar-editor">
@@ -41,7 +42,7 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
   }
 
   const [content, setContent] = createSignal(result.content);
-  const editor = useStore(drawerContentStore);
+  const editor = useStore(inspectContentStore);
   createEffect(() => {
     const sidebarContent = editor();
     if (!sidebarContent) return;
@@ -108,11 +109,11 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
     <div>
       <button
         onClick={() => {
-          patchDrawerContent({
+          patchInspectContent({
             content: content(),
             rawContent: getTableRawContent(content())
           });
-          setIsDrawerOpen(false);
+          setInspectStatus(InspectStatus.PreviewingMarkdown);
         }}
       >
         Save

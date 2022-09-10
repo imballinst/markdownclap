@@ -1,31 +1,36 @@
 import { atom } from 'nanostores';
 import { alterColumn, ParsedStringResult, ParsedTableResult } from '../utils/operators/table';
 
-// Drawer status.
-export const drawerStatusStore = atom<boolean>(false);
+// Drawer inspect status.
+export enum InspectStatus {
+  PreviewingMarkdown,
+  InspectingSnippet
+}
 
-export function setIsDrawerOpen(isOpen: boolean) {
-  drawerStatusStore.set(isOpen);
+export const inspectStatusStore = atom<InspectStatus>(InspectStatus.PreviewingMarkdown);
+
+export function setInspectStatus(newStatus: InspectStatus) {
+  inspectStatusStore.set(newStatus);
 }
 
 // Drawer content.
-export type DrawerContent = ParsedStringResult;
-export const drawerContentStore = atom<DrawerContent>(undefined);
+export type InspectContent = ParsedStringResult;
+export const inspectContentStore = atom<InspectContent>(undefined);
 
-export function setDrawerContent(sidebarContent: DrawerContent) {
-  drawerContentStore.set(sidebarContent);
+export function setInspectContent(inspectContent: InspectContent) {
+  inspectContentStore.set(inspectContent);
 }
 
-export function patchDrawerContent(
-  sidebarContent: Omit<Partial<NonNullable<DrawerContent>>, 'type'>
+export function patchInspectContent(
+  inspectContent: Omit<Partial<NonNullable<InspectContent>>, 'type'>
 ) {
-  const oldSidebarContent = drawerContentStore.get();
-  if (oldSidebarContent === undefined) return;
+  const oldInspectContent = inspectContentStore.get();
+  if (oldInspectContent === undefined) return;
 
-  const newSidebarContent: ParsedTableResult = { ...oldSidebarContent };
-  newSidebarContent.content = sidebarContent.content || oldSidebarContent.content;
-  newSidebarContent.rawContent = sidebarContent.rawContent || oldSidebarContent.rawContent;
-  drawerContentStore.set(newSidebarContent);
+  const newInspectContent: ParsedTableResult = { ...oldInspectContent };
+  newInspectContent.content = inspectContent.content || oldInspectContent.content;
+  newInspectContent.rawContent = inspectContent.rawContent || oldInspectContent.rawContent;
+  inspectContentStore.set(newInspectContent);
 }
 
 export type ColumnContentType = 'ordered-number' | 'add-column-before';
@@ -52,19 +57,19 @@ export type ColumnAction =
     };
 
 export function alterTable(params: ColumnAction) {
-  const sidebarContent = drawerContentStore.get();
-  if (!sidebarContent) return;
+  const inspectContent = inspectContentStore.get();
+  if (!inspectContent) return;
 
   switch (params.type) {
     case 'add-column-after': {
       if (params.payload.columnContentType === 'ordered-number') {
         const newContent = alterColumn({
-          content: sidebarContent.content,
+          content: inspectContent.content,
           action: {
             type: 'add',
             columnIdx: params.payload.columnIndex + 1,
             content: {
-              columns: sidebarContent.content.rows.map((_, idx) => ({
+              columns: inspectContent.content.rows.map((_, idx) => ({
                 content: `${idx + 1}`,
                 post: '',
                 pre: ''
@@ -78,7 +83,7 @@ export function alterTable(params: ColumnAction) {
             }
           }
         });
-        patchDrawerContent({
+        patchInspectContent({
           content: newContent
         });
       }
@@ -88,12 +93,12 @@ export function alterTable(params: ColumnAction) {
     case 'add-column-before': {
       if (params.payload.columnContentType === 'ordered-number') {
         const newContent = alterColumn({
-          content: sidebarContent.content,
+          content: inspectContent.content,
           action: {
             type: 'add',
             columnIdx: params.payload.columnIndex,
             content: {
-              columns: sidebarContent.content.rows.map((_, idx) => ({
+              columns: inspectContent.content.rows.map((_, idx) => ({
                 content: `${idx + 1}`,
                 post: '',
                 pre: ''
@@ -107,7 +112,7 @@ export function alterTable(params: ColumnAction) {
             }
           }
         });
-        patchDrawerContent({
+        patchInspectContent({
           content: newContent
         });
       }
@@ -117,12 +122,12 @@ export function alterTable(params: ColumnAction) {
     case 'fill-column': {
       if (params.payload.columnContentType === 'ordered-number') {
         const newContent = alterColumn({
-          content: sidebarContent.content,
+          content: inspectContent.content,
           action: {
             type: 'replace',
             columnIdx: params.payload.columnIndex,
             content: {
-              columns: sidebarContent.content.rows.map((columns, index) => {
+              columns: inspectContent.content.rows.map((columns, index) => {
                 const column = { ...columns[params.payload.columnIndex] };
                 column.content = `${index + 1}`;
                 return column;
@@ -130,7 +135,7 @@ export function alterTable(params: ColumnAction) {
             }
           }
         });
-        patchDrawerContent({
+        patchInspectContent({
           content: newContent
         });
       }
@@ -139,14 +144,14 @@ export function alterTable(params: ColumnAction) {
     }
     case 'swap-column': {
       const newContent = alterColumn({
-        content: sidebarContent.content,
+        content: inspectContent.content,
         action: {
           type: 'swap',
           columnIdx: params.payload.columnIndex,
           targetColumnIndex: params.payload.targetColumnIndex
         }
       });
-      patchDrawerContent({
+      patchInspectContent({
         content: newContent
       });
 
@@ -154,13 +159,13 @@ export function alterTable(params: ColumnAction) {
     }
     case 'delete-column': {
       const newContent = alterColumn({
-        content: sidebarContent.content,
+        content: inspectContent.content,
         action: {
           type: 'delete',
           columnIdx: params.payload.columnIndex
         }
       });
-      patchDrawerContent({
+      patchInspectContent({
         content: newContent
       });
     }

@@ -1,0 +1,9 @@
+.segment-heading {
+  font-size: theme('fontSize.lg');
+  font-weight: theme('fontWeight.medium');
+}
+
+.segment-subtext {
+  font-size: theme('fontSize.sm');
+  color: theme('colors.slate.700');
+}
