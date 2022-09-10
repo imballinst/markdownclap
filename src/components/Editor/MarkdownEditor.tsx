@@ -89,9 +89,12 @@ export const MarkdownEditor = () => {
           onClick={() => {
             let effectiveValue = markdown();
             let parseResult: ParsedStringResult = undefined;
+            let selectionStart = 0;
+            let selectionEnd = 0;
 
             if (textareaElement) {
-              const { selectionStart, selectionEnd } = textareaElement;
+              selectionStart = textareaElement.selectionStart;
+              selectionEnd = textareaElement.selectionEnd;
 
               effectiveValue = effectiveValue.slice(selectionStart, selectionEnd);
               parseResult = parseTableString(effectiveValue);
@@ -105,7 +108,7 @@ export const MarkdownEditor = () => {
             }
 
             setInspectStatus(InspectStatus.InspectingSnippet);
-            setPrevSelected(selected());
+            setPrevSelected([selectionStart, selectionEnd]);
             setSelected(undefined);
           }}
         >

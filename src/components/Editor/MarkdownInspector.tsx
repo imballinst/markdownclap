@@ -16,21 +16,19 @@ import {
   ParsedTableResult
 } from '../../utils/operators/table';
 
-import './Drawer.css';
+import './MarkdownInspector.css';
 
 const ARROW_UP_KEY = 'ArrowUp';
 const ARROW_DOWN_KEY = 'ArrowDown';
 const ARROW_LEFT_KEY = 'ArrowLeft';
 const ARROW_RIGHT_KEY = 'ArrowRight';
 
-export function Drawer() {
-  const editor = useStore(inspectContentStore);
+export function MarkdownInspector() {
+  const inspectContent = useStore(inspectContentStore);
 
   return (
-    <div class="sidebar-editor">
-      <Show when={editor() !== undefined}>
-        <Table result={editor()} />
-      </Show>
+    <div class="markdown-inspector">
+      <Table result={inspectContent()} />
     </div>
   );
 }
@@ -108,6 +106,7 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
   return (
     <div>
       <button
+        class="button-sm"
         onClick={() => {
           patchInspectContent({
             content: content(),
@@ -116,7 +115,7 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
           setInspectStatus(InspectStatus.PreviewingMarkdown);
         }}
       >
-        Save
+        Save Changes
       </button>
 
       <table class="sidebar-table">

@@ -1,31 +1,35 @@
-.sidebar-editor table {
+.markdown-inspector {
+  margin-top: theme('spacing.4');
+}
+
+.markdown-inspector table {
   width: 100%;
   margin-top: theme('spacing.4');
 }
 
-.sidebar-editor table th.action-header-column {
+.markdown-inspector table th.action-header-column {
   padding: theme('spacing.2') 0;
   text-align: right;
 }
 
-.sidebar-editor table th,
-.sidebar-editor table td {
+.markdown-inspector table th,
+.markdown-inspector table td {
   padding: theme('spacing[0.5]');
 }
 
-.sidebar-editor table th input {
+.markdown-inspector table th input {
   font-weight: theme('fontWeight.bold');
 }
 
-.sidebar-editor table th input,
-.sidebar-editor table td input {
+.markdown-inspector table th input,
+.markdown-inspector table td input {
   width: 100%;
   border-radius: theme('borderRadius.none');
   border-color: theme('colors.slate.200');
   border-width: theme('borderWidth.DEFAULT');
 }
 
-.sidebar-editor .secondary-button,
+.markdown-inspector .secondary-button,
 .popover-dropdown .secondary-button {
   padding: theme('spacing.1') theme('spacing.2');
   background: none;
@@ -38,7 +42,7 @@
   margin-top: theme('spacing.2');
 }
 
-.sidebar-editor .secondary-button:hover,
+.markdown-inspector .secondary-button:hover,
 .popover-dropdown .secondary-button:hover {
   background: theme('colors.blue.50');
 }
