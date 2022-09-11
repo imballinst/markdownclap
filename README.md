@@ -1,42 +1,40 @@
-# Welcome to [Astro](https://astro.build)
+# Markdown Clap
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
+Generally, updating Markdown is easy. We can just use our text editor or use a lot of online tools that allow Markdown previewing. However, one of the pain points that I felt when editing Markdown was when updating tables. When I need to remove a row with ordered numbers, I need to also update ALL ROWS below the deleted row. This is a chore and I think it is a room for improvement.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Main Features
 
-## 🚀 Project Structure
+1. Markdown preview
+2. Markdown inspection, with supported elements including:
+   2.1. Tables
 
-Inside of your Astro project, you'll see the following folders and files:
+## Development
 
+### Requirements
+
+1. Node.js® 16
+2. Yarn Classic
+
+### Starting the development server
+
+```bash
+# Install deps
+yarn
+
+# Start the development server
+yarn dev
 ```
-/
-├── public/
-│   └── favicon.ico
-├── src/
-│   ├── components/
-│   │   └── Layout.astro
-│   └── pages/
-│       └── index.astro
-└── package.json
+
+### Testing
+
+```bash
+yarn test
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+### Publishing
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components or layouts.
+At the moment, the site is published to GitHub pages: https://imballinst.github.io/markdownclap. This is automated on every push to `main` branch.
 
-Any static assets, like images, can be placed in the `public/` directory.
+## License
 
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command           | Action                                       |
-| :---------------- | :------------------------------------------- |
-| `npm install`     | Installs dependencies                        |
-| `npm run dev`     | Starts local dev server at `localhost:3000`  |
-| `npm run build`   | Build your production site to `./dist/`      |
-| `npm run preview` | Preview your build locally, before deploying |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+MIT

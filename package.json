@@ -23,5 +23,8 @@
     "@nanostores/solid": "0.2.0",
     "marked": "4.1.0",
     "nanostores": "0.7.0"
+  },
+  "engines": {
+    "node": "16"
   }
 }
