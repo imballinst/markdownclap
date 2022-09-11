@@ -12,6 +12,7 @@ import { isKeycodeNumber } from '../../utils/key-parser';
 import { addHeading } from '../../utils/headings';
 import { ParsedStringResult, parseTableString } from '../../utils/operators/table';
 import { markdownStore, setMarkdown } from '../../store/markdown';
+import { setAlert } from '../../store/alert';
 
 export const MarkdownEditor = () => {
   const markdown = useStore(markdownStore);
@@ -103,10 +104,16 @@ export const MarkdownEditor = () => {
               textareaElement.setSelectionRange(0, 0);
             }
 
-            if (parseResult?.type === 'table') {
-              setInspectContent(parseResult);
+            if (parseResult === undefined) {
+              setAlert({
+                message:
+                  'Cannot inspect element: element is not supported yet for inspection or selections are invalid.',
+                type: 'error'
+              });
+              return;
             }
 
+            setInspectContent(parseResult);
             setInspectStatus(InspectStatus.InspectingSnippet);
             setPrevSelected([selectionStart, selectionEnd]);
             setSelected(undefined);

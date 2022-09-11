@@ -1,6 +1,7 @@
 import { useStore } from '@nanostores/solid';
 import { createEffect, createSignal, JSX, Show } from 'solid-js';
 import { Portal } from 'solid-js/web';
+import { setAlert } from '../../store/alert';
 import {
   alterTable,
   ColumnContentType,
@@ -113,6 +114,7 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
             rawContent: getTableRawContent(content())
           });
           setInspectStatus(InspectStatus.PreviewingMarkdown);
+          setAlert({ message: 'Successfully applied changes.', type: 'info' });
         }}
       >
         Save Changes
@@ -185,10 +187,7 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
   );
 }
 
-interface PopoverStyleState {
-  top: `${number}px`;
-  left: `${number}px`;
-}
+type PopoverStyleState = Pick<JSX.CSSProperties, 'left' | 'top'>;
 
 type ColumnActionsType =
   | 'add-column-before'
@@ -304,7 +303,7 @@ export function HeaderButton({ columnIndex, headers }: HeaderButtonProps) {
                       Fill column
                     </option>
                     <option class="text-xs" value="swap-column" disabled={headersLength === 1}>
-                      Move column
+                      Swap column
                     </option>
                     <option class="text-xs" value="delete-column" disabled={headersLength === 1}>
                       Delete column

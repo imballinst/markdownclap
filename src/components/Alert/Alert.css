@@ -1,0 +1,29 @@
+.alert-root {
+  display: flex;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  transform: translateY(theme('spacing.12'));
+  opacity: 0;
+  margin-left: theme('spacing.4');
+  margin-bottom: theme('spacing.12');
+  padding: theme('spacing.1') theme('spacing.2');
+  border-radius: theme('borderRadius.md');
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  color: theme('colors.white');
+  font-size: theme('fontSize.sm');
+  max-width: 325px;
+}
+
+.alert-root.alert-shown {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.alert-root.alert-info {
+  background: theme('colors.blue.600');
+}
+
+.alert-root.alert-error {
+  background: theme('colors.rose.600');
+}

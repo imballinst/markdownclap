@@ -1,4 +1,6 @@
 ---
+import { Alert } from '../components/Alert/Alert';
+import GitHub from '../components/Icons/GitHub.astro';
 import { Link } from '../components/Link/Link';
 
 export interface Props {
@@ -6,6 +8,7 @@ export interface Props {
 }
 
 const { title } = Astro.props as Props;
+const currentYear = new Date().getFullYear()
 ---
 
 <!DOCTYPE html>
@@ -25,17 +28,24 @@ const { title } = Astro.props as Props;
     <title>{title}</title>
   </head>
   <body class="h-screen flex flex-col bg-slate-100">
-    <div class="px-4 py-2 bg-sky-100">
+    <div class="px-4 py-2 bg-sky-100 flex justify-between">
       <h1 class="text-2xl inline-flex">Markdown👏</h1>
+
+      <div class="flex flex-col justify-center">
+        <Link href="https://github.com/imballinst/markdownclap">
+          <GitHub class="w-6 h-6 hover:fill-slate-700" />
+        </Link>
+      </div>
     </div>
+
+    <Alert client:only="solid-js" />
 
     <main class="flex-1">
       <slot />
     </main>
 
-    <footer class="py-2 text-xs text-center bg-sky-100">
-      If you have feedback for this site, please let me know on my
-      <Link href="https://twitter.com/Ajiballinst">Twitter</Link>. Thanks!
+    <footer class="py-2 text-xs text-center bg-sky-100 text-slate-700">
+      <div>Copyright © {currentYear} Try Ajitiono</div>
     </footer>
     <style>
       html,
