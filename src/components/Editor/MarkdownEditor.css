@@ -9,26 +9,3 @@
   border-radius: 0;
   font-size: theme('fontSize.sm');
 }
-
-@media screen(sm) {
-  .markdown-result {
-    margin-top: theme('spacing.14');
-  }
-}
-
-.markdown-result table {
-  width: 100%;
-}
-
-.markdown-result th {
-  text-align: left;
-}
-
-.markdown-result th,
-.markdown-result td {
-  border-top-width: theme('borderWidth.2');
-  border-bottom-width: theme('borderWidth.2');
-  border-color: theme('borderColor.slate.200');
-  padding: theme('spacing.1') theme('spacing.4');
-  font-size: theme('fontSize.sm');
-}

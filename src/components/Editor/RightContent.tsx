@@ -7,6 +7,8 @@ import { markdownStore } from '../../store/markdown';
 import { MarkdownInspector } from './MarkdownInspector';
 import { SegmentHeading } from './SegmentHeading';
 
+import './RightContent.css';
+
 const SEGMENT_HEADING_CONTENT = {
   [InspectStatus.PreviewingMarkdown]: {
     title: 'Markdown preview',
@@ -18,7 +20,12 @@ const SEGMENT_HEADING_CONTENT = {
   },
   [InspectStatus.InspectingSnippet]: {
     title: 'Snippet inspection',
-    content: <>To save changes and return to markdown preview, click the "Save Changes" button.</>
+    content: (
+      <>
+        Click the "Save Changes" button to update the Markdown on the left pane based on the
+        updates.
+      </>
+    )
   }
 };
 
@@ -33,7 +40,7 @@ export default function RightContent() {
       </SegmentHeading>
 
       <Show when={inspectStatus() === InspectStatus.PreviewingMarkdown}>
-        <pre class="markdown-result" innerHTML={marked(markdown())} />
+        <div class="markdown-result" innerHTML={marked(markdown())} />
       </Show>
 
       <Show when={inspectStatus() === InspectStatus.InspectingSnippet}>
