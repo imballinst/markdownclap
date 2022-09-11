@@ -14,7 +14,6 @@
     "@astrojs/tailwind": "1.0.0",
     "@types/marked": "4.0.7",
     "astro": "1.2.1",
-    "sass": "1.54.9",
     "solid-js": "1.5.4",
     "typescript": "4.8.3",
     "vitest": "0.23.2"

@@ -6,9 +6,11 @@ Generally, updating Markdown is easy. We can just use our text editor or use a l
 
 1. Markdown preview
 2. Markdown inspection, with supported elements including:
-   2.1. Tables
+   1. Tables
 
 ## Development
+
+This site is built using [Astro](https://astro.build) and [SolidJS](https://www.solidjs.com). Additionally, to share states, we are using [nanostores](https://github.com/nanostores/nanostores).
 
 ### Requirements
 
