@@ -29,7 +29,7 @@ const SEGMENT_HEADING_CONTENT = {
   }
 };
 
-export default function RightContent() {
+export function RightContent() {
   const markdown = useStore(markdownStore);
   const inspectStatus = useStore(inspectStatusStore);
 
