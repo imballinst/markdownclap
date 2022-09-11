@@ -3,10 +3,13 @@ import solid from '@astrojs/solid-js';
 
 import tailwind from '@astrojs/tailwind';
 
+let basePath = process.env.BASE_PATH || '';
+if (!basePath.startsWith('/')) {
+  basePath = `/${basePath}`;
+}
+
 // https://astro.build/config
 export default defineConfig({
-  integrations: [solid(), tailwind()],
-  vite: {
-    base: process.env.BASE_PATH
-  }
+  base: basePath,
+  integrations: [solid(), tailwind()]
 });
