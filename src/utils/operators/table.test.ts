@@ -664,7 +664,7 @@ describe('alterColumn', () => {
         }
       ])
     };
-    let alterContent = {
+    let alteredContent = {
       header: {
         content: 'No.',
         post: '',
@@ -682,22 +682,25 @@ describe('alterColumn', () => {
       }))
     };
     let expected: ParsedTableResult['content'] = {
-      headers: [alterContent.header, ...initialContent.headers],
-      separators: [alterContent.separator, ...initialContent.separators],
-      rows: initialContent.rows.map((columns, rowIdx) => [alterContent.columns[rowIdx], ...columns])
+      headers: [alteredContent.header, ...initialContent.headers],
+      separators: [alteredContent.separator, ...initialContent.separators],
+      rows: initialContent.rows.map((columns, rowIdx) => [
+        alteredContent.columns[rowIdx],
+        ...columns
+      ])
     };
     let result = alterColumn({
       content: initialContent,
       action: {
         columnIdx: 0,
-        content: alterContent,
+        content: alteredContent,
         type: 'add'
       }
     });
     expect(expected).toEqual(result);
 
     // Try adding one more.
-    alterContent = {
+    alteredContent = {
       header: {
         content: 'Score',
         post: '',
@@ -715,22 +718,22 @@ describe('alterColumn', () => {
       }))
     };
     expected = {
-      headers: [...result.headers, alterContent.header],
-      separators: [...result.separators, alterContent.separator],
-      rows: result.rows.map((columns, rowIdx) => [...columns, alterContent.columns[rowIdx]])
+      headers: [...result.headers, alteredContent.header],
+      separators: [...result.separators, alteredContent.separator],
+      rows: result.rows.map((columns, rowIdx) => [...columns, alteredContent.columns[rowIdx]])
     };
     result = alterColumn({
       content: result,
       action: {
         columnIdx: 2,
-        content: alterContent,
+        content: alteredContent,
         type: 'add'
       }
     });
     expect(expected).toEqual(result);
   });
 
-  test('remove', () => {
+  test('delete', () => {
     const content: ParsedTableResult['content'] = {
       headers: [
         {
@@ -773,7 +776,7 @@ describe('alterColumn', () => {
       content,
       action: {
         columnIdx: 0,
-        type: 'remove'
+        type: 'delete'
       }
     });
 
@@ -781,6 +784,168 @@ describe('alterColumn', () => {
       headers: content.headers.slice(1),
       separators: content.separators.slice(1),
       rows: content.rows.map((columns) => columns.slice(1))
+    };
+    expect(expected).toEqual(result);
+  });
+
+  test('replace', () => {
+    const content: ParsedTableResult['content'] = {
+      headers: [
+        {
+          content: 'No',
+          post: '',
+          pre: ''
+        },
+        {
+          content: 'Name',
+          post: '',
+          pre: ''
+        },
+        {
+          content: 'Description',
+          post: '',
+          pre: ''
+        }
+      ],
+      separators: [
+        {
+          content: '-',
+          post: '',
+          pre: ''
+        },
+        {
+          content: '-',
+          post: '',
+          pre: ''
+        },
+        {
+          content: '-',
+          post: '',
+          pre: ''
+        }
+      ],
+      rows: Array.from(new Array(5), (_, idx) => [
+        {
+          content: `${idx + 1}`,
+          post: '',
+          pre: ''
+        },
+        {
+          content: `User ${idx + 1}`,
+          post: '',
+          pre: ''
+        },
+        {
+          content: `Sample description for user ${idx + 1}`,
+          post: '',
+          pre: ''
+        }
+      ])
+    };
+
+    const alteredContent = {
+      columns: Array.from(new Array(5), (_, idx) => ({
+        content: `Sample random description for user ${idx + 1}`,
+        post: '',
+        pre: ''
+      })),
+      header: {
+        content: `Not a description`,
+        post: '',
+        pre: ''
+      },
+      separator: {
+        content: `-`,
+        post: '  ',
+        pre: '  '
+      }
+    };
+    const result = alterColumn({
+      content,
+      action: {
+        columnIdx: 2,
+        type: 'replace',
+        content: alteredContent
+      }
+    });
+
+    const expected: ParsedTableResult['content'] = {
+      headers: content.headers.slice(0, 2).concat(alteredContent.header),
+      separators: content.separators.slice(0, 2).concat(alteredContent.separator),
+      rows: content.rows.map((columns, rowIdx) =>
+        columns.slice(0, 2).concat(alteredContent.columns[rowIdx])
+      )
+    };
+    expect(expected).toEqual(result);
+  });
+
+  test('swap', () => {
+    const content: ParsedTableResult['content'] = {
+      headers: [
+        {
+          content: 'No',
+          post: '',
+          pre: ''
+        },
+        {
+          content: 'Name',
+          post: '',
+          pre: ''
+        },
+        {
+          content: 'Description',
+          post: '',
+          pre: ''
+        }
+      ],
+      separators: [
+        {
+          content: '-',
+          post: '',
+          pre: ''
+        },
+        {
+          content: '-',
+          post: '',
+          pre: ''
+        },
+        {
+          content: '-',
+          post: '',
+          pre: ''
+        }
+      ],
+      rows: Array.from(new Array(5), (_, idx) => [
+        {
+          content: `${idx + 1}`,
+          post: '',
+          pre: ''
+        },
+        {
+          content: `User ${idx + 1}`,
+          post: '',
+          pre: ''
+        },
+        {
+          content: `Sample description for user ${idx + 1}`,
+          post: '',
+          pre: ''
+        }
+      ])
+    };
+    const result = alterColumn({
+      content,
+      action: {
+        columnIdx: 0,
+        type: 'swap',
+        targetColumnIndex: 2
+      }
+    });
+
+    const expected: ParsedTableResult['content'] = {
+      headers: [content.headers[2], content.headers[1], content.headers[0]],
+      separators: [content.separators[2], content.separators[1], content.separators[0]],
+      rows: content.rows.map((columns) => [columns[2], columns[1], columns[0]])
     };
     expect(expected).toEqual(result);
   });
