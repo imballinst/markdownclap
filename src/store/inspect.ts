@@ -34,27 +34,30 @@ export function patchInspectContent(
 }
 
 export type ColumnContentType = 'ordered-number' | 'add-column-before';
-export type ColumnAction =
-  | {
-      type: 'add-column-before' | 'add-column-after' | 'fill-column';
-      payload: {
-        columnIndex: number;
-        columnContentType: ColumnContentType;
-      };
-    }
-  | {
-      type: 'swap-column';
-      payload: {
-        columnIndex: number;
-        targetColumnIndex: number;
-      };
-    }
-  | {
-      type: 'delete-column';
-      payload: {
-        columnIndex: number;
-      };
-    };
+
+// Column actions.
+interface ModifyColumnAction {
+  type: 'add-column-before' | 'add-column-after' | 'fill-column';
+  payload: {
+    columnIndex: number;
+    columnContentType: ColumnContentType;
+  };
+}
+interface SwapColumnAction {
+  type: 'swap-column';
+  payload: {
+    columnIndex: number;
+    targetColumnIndex: number;
+  };
+}
+interface DeleteColumnAction {
+  type: 'delete-column';
+  payload: {
+    columnIndex: number;
+  };
+}
+
+export type ColumnAction = ModifyColumnAction | SwapColumnAction | DeleteColumnAction;
 
 export function alterTable(params: ColumnAction) {
   const inspectContent = inspectContentStore.get();
@@ -62,83 +65,65 @@ export function alterTable(params: ColumnAction) {
 
   switch (params.type) {
     case 'add-column-after': {
-      if (params.payload.columnContentType === 'ordered-number') {
-        const newContent = alterColumn({
-          content: inspectContent.content,
-          action: {
-            type: 'add',
-            columnIdx: params.payload.columnIndex + 1,
-            content: {
-              columns: inspectContent.content.rows.map((_, idx) => ({
-                content: `${idx + 1}`,
-                post: '',
-                pre: ''
-              })),
-              header: { content: '', post: '', pre: '' },
-              separator: {
-                content: '-',
-                post: '',
-                pre: ''
-              }
+      const newContent = alterColumn({
+        content: inspectContent.content,
+        action: {
+          type: 'add',
+          columnIdx: params.payload.columnIndex + 1,
+          content: {
+            columns: getModifiedColumns(params.payload, inspectContent.content.rows.length),
+            header: { content: '', post: '', pre: '' },
+            separator: {
+              content: '-',
+              post: '',
+              pre: ''
             }
           }
-        });
-        patchInspectContent({
-          content: newContent
-        });
-      }
+        }
+      });
+      patchInspectContent({
+        content: newContent
+      });
 
       break;
     }
     case 'add-column-before': {
-      if (params.payload.columnContentType === 'ordered-number') {
-        const newContent = alterColumn({
-          content: inspectContent.content,
-          action: {
-            type: 'add',
-            columnIdx: params.payload.columnIndex,
-            content: {
-              columns: inspectContent.content.rows.map((_, idx) => ({
-                content: `${idx + 1}`,
-                post: '',
-                pre: ''
-              })),
-              header: { content: '', post: '', pre: '' },
-              separator: {
-                content: '-',
-                post: '',
-                pre: ''
-              }
+      const newContent = alterColumn({
+        content: inspectContent.content,
+        action: {
+          type: 'add',
+          columnIdx: params.payload.columnIndex,
+          content: {
+            columns: getModifiedColumns(params.payload, inspectContent.content.rows.length),
+            header: { content: '', post: '', pre: '' },
+            separator: {
+              content: '-',
+              post: '',
+              pre: ''
             }
           }
-        });
-        patchInspectContent({
-          content: newContent
-        });
-      }
+        }
+      });
+      patchInspectContent({
+        content: newContent
+      });
 
       break;
     }
     case 'fill-column': {
-      if (params.payload.columnContentType === 'ordered-number') {
-        const newContent = alterColumn({
-          content: inspectContent.content,
-          action: {
-            type: 'replace',
-            columnIdx: params.payload.columnIndex,
-            content: {
-              columns: inspectContent.content.rows.map((columns, index) => {
-                const column = { ...columns[params.payload.columnIndex] };
-                column.content = `${index + 1}`;
-                return column;
-              })
-            }
+      const newContent = alterColumn({
+        content: inspectContent.content,
+        action: {
+          type: 'replace',
+          columnIdx: params.payload.columnIndex,
+          content: {
+            columns: getModifiedColumns(params.payload, inspectContent.content.rows.length)
           }
-        });
-        patchInspectContent({
-          content: newContent
-        });
-      }
+        }
+      });
+      patchInspectContent({
+        content: newContent
+      });
 
       break;
     }
@@ -170,4 +155,13 @@ export function alterTable(params: ColumnAction) {
       });
     }
   }
+}
+
+// Helper content.
+function getModifiedColumns(columnAction: ModifyColumnAction['payload'], rowsLength: number) {
+  return Array.from(new Array(rowsLength)).map((_, index) => ({
+    content: columnAction.columnContentType === 'ordered-number' ? `${index + 1}` : '',
+    post: '',
+    pre: ''
+  }));
 }

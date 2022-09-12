@@ -53,6 +53,19 @@ const currentYear = new Date().getFullYear()
         font-family: 'Poppins', sans-serif;
       }
 
+      :global(ul),
+      :global(ol) {
+        margin-left: theme('spacing.3')
+      }
+
+      :global(ul) {
+        list-style: disc;
+      }
+
+      :global(ol) {
+        list-style: decimal;
+      }
+
       :global(input),
       :global(button),
       :global(textarea),

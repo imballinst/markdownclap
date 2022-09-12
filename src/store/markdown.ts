@@ -17,6 +17,12 @@ const DEFAULT_STRING = `
 |11|hehe|this is a sample description 11|
 
 Sample paragraph
+
+- sample item 1
+- sample item 2
+
+1. sample item 1
+2. sample item 2
 `.trim();
 
 export const markdownStore = atom<string>(DEFAULT_STRING);

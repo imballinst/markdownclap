@@ -26,11 +26,10 @@ jobs:
           node-version: 16.x
           cache: yarn
       - run: yarn
-      # Build Storybook.
+      - run: yarn test
       - run: yarn build
         env:
           BASE_PATH: /markdownclap
-      # Deploy Storybook.
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.ref == 'refs/heads/main' }}
