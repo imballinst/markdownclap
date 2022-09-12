@@ -8,7 +8,17 @@ export interface Props {
 }
 
 const { title } = Astro.props as Props;
-const currentYear = new Date().getFullYear()
+
+const date = new Date()
+const currentYear = date.getUTCFullYear().toString().padStart(2, '0')
+const currentMonth = date.getUTCMonth().toString().padStart(2, '0')
+const currentDate = date.getUTCDate().toString().padStart(2, '0')
+
+let version = 'dev'
+
+if (import.meta.env.VERSION && import.meta.env.GIT_HASH) {
+  version = `${import.meta.env.VERSION}.${import.meta.env.GIT_HASH}`
+}
 ---
 
 <!DOCTYPE html>
@@ -46,6 +56,7 @@ const currentYear = new Date().getFullYear()
 
     <footer class="py-2 text-xs text-center bg-sky-100 text-slate-700">
       <div>Copyright © {currentYear} Try Ajitiono</div>
+      <div class="text-slate-400">Build {version} ({currentYear}{currentMonth}{currentDate})</div>
     </footer>
     <style>
       html,
