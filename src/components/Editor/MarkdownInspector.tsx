@@ -41,12 +41,9 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
   }
 
   const [content, setContent] = createSignal(result.content);
-  const editor = useStore(inspectContentStore);
   createEffect(() => {
-    const sidebarContent = editor();
-    if (!sidebarContent) return;
-
-    setContent(sidebarContent.content);
+    if (!result) return;
+    setContent(result.content);
   });
 
   function onArrowKeyPress(elementId: string, code: string) {
@@ -73,8 +70,6 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
     }
   }
 
-  let arrowInterval: number;
-  let arrowTimeout: number;
   const onInputKeyDown: JSX.EventHandlerUnion<HTMLInputElement, KeyboardEvent> = (e) => {
     if (
       (e.currentTarget.selectionStart === 0 &&
@@ -84,24 +79,8 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
     ) {
       e.preventDefault();
 
-      clearTimeout(arrowTimeout);
-      clearInterval(arrowInterval);
-
       onArrowKeyPress(e.currentTarget.id, e.code);
-
-      arrowTimeout = window.setTimeout(() => {
-        arrowInterval = window.setInterval(() => {
-          if (document.activeElement?.id.startsWith('grid-cell-')) {
-            onArrowKeyPress(document.activeElement.id, e.code);
-          }
-        }, 250);
-      }, 1000);
     }
-  };
-
-  const onInputKeyUp: JSX.EventHandlerUnion<HTMLInputElement, KeyboardEvent> = (e) => {
-    clearTimeout(arrowTimeout);
-    clearInterval(arrowInterval);
   };
 
   return (
@@ -123,20 +102,19 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
       <table class="sidebar-table">
         <thead>
           <tr>
-            {content().headers.map((_, index) => (
+            {result.content.headers.map((_, index) => (
               <th class="action-header-column">
-                <HeaderButton columnIndex={index} headers={content().headers} />
+                <HeaderButton columnIndex={index} headers={result.content.headers} />
               </th>
             ))}
           </tr>
           <tr>
-            {content().headers.map((header, index) => (
+            {result.content.headers.map((header, index) => (
               <th>
                 <input
                   value={header.content}
                   id={`grid-cell-0-${index}`}
                   onKeyDown={onInputKeyDown}
-                  onKeyUp={onInputKeyUp}
                   onChange={(e) => {
                     setContent((prev) => {
                       const newHeaders = [...prev.headers];
@@ -154,14 +132,13 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
           </tr>
         </thead>
         <tbody>
-          {content().rows.map((row, rowIndex) => {
+          {result.content.rows.map((row, rowIndex) => {
             const columns = row.map((column, columnIndex) => (
               <td>
                 <input
                   value={column.content}
                   id={`grid-cell-${rowIndex + 1}-${columnIndex}`}
                   onKeyDown={onInputKeyDown}
-                  onKeyUp={onInputKeyUp}
                   onChange={(e) => {
                     setContent((prev) => {
                       const newRows = [...prev.rows];

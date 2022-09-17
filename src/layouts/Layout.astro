@@ -11,7 +11,7 @@ const { title } = Astro.props as Props;
 
 const date = new Date()
 const currentYear = date.getUTCFullYear().toString().padStart(2, '0')
-const currentMonth = date.getUTCMonth().toString().padStart(2, '0')
+const currentMonth = (date.getUTCMonth() + 1).toString().padStart(2, '0')
 const currentDate = date.getUTCDate().toString().padStart(2, '0')
 
 let version = 'dev'
