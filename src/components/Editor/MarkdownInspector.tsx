@@ -1,5 +1,6 @@
 import { useStore } from '@nanostores/solid';
-import { createEffect, createSignal, JSX, Show } from 'solid-js';
+import { createEffect, createSignal, For, JSX, Show } from 'solid-js';
+import { createStore } from 'solid-js/store';
 import { Portal } from 'solid-js/web';
 import { setAlert } from '../../store/alert';
 import {
@@ -40,10 +41,12 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
     return null;
   }
 
-  const [content, setContent] = createSignal(result.content);
+  const [headers, setHeaders] = createStore(result.content.headers);
+  const [rows, setRows] = createStore(result.content.rows);
   createEffect(() => {
     if (!result) return;
-    setContent(result.content);
+    setHeaders(result.content.headers);
+    setRows(result.content.rows);
   });
 
   function onArrowKeyPress(elementId: string, code: string) {
@@ -88,9 +91,15 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
       <button
         class="button-sm"
         onClick={() => {
+          const content = {
+            rows,
+            headers,
+            separators: result.content.separators
+          };
+
           patchInspectContent({
-            content: content(),
-            rawContent: getTableRawContent(content())
+            content: content,
+            rawContent: getTableRawContent(content)
           });
           setInspectStatus(InspectStatus.PreviewingMarkdown);
           setAlert({ message: 'Successfully applied changes.', type: 'info' });
@@ -102,24 +111,24 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
       <table class="sidebar-table">
         <thead>
           <tr>
-            {result.content.headers.map((_, index) => (
+            {headers.map((_, index) => (
               <th class="action-header-column">
-                <HeaderButton columnIndex={index} headers={result.content.headers} />
+                <HeaderButton columnIndex={index} headers={headers} />
               </th>
             ))}
           </tr>
           <tr>
-            {result.content.headers.map((header, index) => (
+            {headers.map((header, index) => (
               <th>
                 <input
                   value={header.content}
                   id={`grid-cell-0-${index}`}
                   onKeyDown={onInputKeyDown}
                   onChange={(e) => {
-                    setContent((prev) => {
-                      const newHeaders = [...prev.headers];
+                    setHeaders((prev) => {
+                      const newHeaders = [...prev];
                       newHeaders[index] = {
-                        ...prev.headers[index],
+                        ...prev[index],
                         content: e.currentTarget.value
                       };
 
@@ -132,32 +141,41 @@ function Table({ result }: { result: ParsedTableResult | undefined }) {
           </tr>
         </thead>
         <tbody>
-          {result.content.rows.map((row, rowIndex) => {
-            const columns = row.map((column, columnIndex) => (
-              <td>
-                <input
-                  value={column.content}
-                  id={`grid-cell-${rowIndex + 1}-${columnIndex}`}
-                  onKeyDown={onInputKeyDown}
-                  onChange={(e) => {
-                    setContent((prev) => {
-                      const newRows = [...prev.rows];
-                      const newRow = [...newRows[rowIndex]];
-                      newRow[columnIndex] = {
-                        ...newRow[columnIndex],
-                        content: e.currentTarget.value
-                      };
-                      newRows[rowIndex] = newRow;
+          {
+            <For each={rows} fallback={<div>Loading...</div>}>
+              {(row, rowIndex) => {
+                const columns = (
+                  <For each={row} fallback={<div>Loading...</div>}>
+                    {(column, columnIndex) => (
+                      <td>
+                        <input
+                          value={column.content}
+                          id={`grid-cell-${rowIndex() + 1}-${columnIndex()}`}
+                          onKeyDown={onInputKeyDown}
+                          onChange={(e) => {
+                            setRows((rows) => rows[rowIndex()][columnIndex()]);
+                            // setRows((prev) => {
+                            //   const newRows = [...prev];
+                            //   const newRow = [...newRows[rowIndex()]];
+                            //   newRow[columnIndex()] = {
+                            //     ...newRow[columnIndex()],
+                            //     content: e.currentTarget.value
+                            //   };
+                            //   newRows[rowIndex()] = newRow;
 
-                      return { ...prev, rows: newRows };
-                    });
-                  }}
-                />
-              </td>
-            ));
+                            //   return newRows;
+                            // });
+                          }}
+                        />
+                      </td>
+                    )}
+                  </For>
+                );
 
-            return <tr>{columns}</tr>;
-          })}
+                return <tr>{columns}</tr>;
+              }}
+            </For>
+          }
         </tbody>
       </table>
     </div>
