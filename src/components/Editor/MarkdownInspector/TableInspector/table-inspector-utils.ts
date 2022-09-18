@@ -7,6 +7,7 @@ interface FlattenedTableRow {
 
 interface FlattenedTableColumn {
   id: string;
+  gridIndex: [number, number];
   value: string;
 }
 
@@ -16,7 +17,7 @@ interface FlattenedTable {
   columns: FlattenedTableColumn[];
 }
 
-export function flattenState(parsed: ParsedTableResult['content']): FlattenedTable {
+export function extractTableContent(parsed: ParsedTableResult['content']): FlattenedTable {
   return {
     columns: [],
     rows: [],
