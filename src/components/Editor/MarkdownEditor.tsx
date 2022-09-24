@@ -77,6 +77,8 @@ export const MarkdownEditor = () => {
           selectionEnd + headingStr.length
         );
       });
+    } else {
+      console.info(e.currentTarget.selectionStart, e.currentTarget.selectionEnd);
     }
   };
 
@@ -127,9 +129,9 @@ export const MarkdownEditor = () => {
         class="markdown-editor"
         value={markdown()}
         onKeyDown={onKeyDown}
-        onSelect={(e) => {
+        onKeyUp={(e) => {
           const { selectionStart, selectionEnd } = e.currentTarget;
-          if (selectionStart + selectionEnd === 0) {
+          if (selectionStart === selectionEnd) {
             setSelected(undefined);
           } else {
             setSelected([selectionStart, selectionEnd]);

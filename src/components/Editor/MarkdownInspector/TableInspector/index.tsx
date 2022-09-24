@@ -128,18 +128,7 @@ export function TableInspector({ result }: { result: ParsedTableResult | undefin
                           id={`grid-cell-${rowIndex() + 1}-${columnIndex()}`}
                           onKeyDown={onInputKeyDown}
                           onChange={(e) => {
-                            setRows((rows) => rows);
-                            // setRows((prev) => {
-                            //   const newRows = [...prev];
-                            //   const newRow = [...newRows[rowIndex()]];
-                            //   newRow[columnIndex()] = {
-                            //     ...newRow[columnIndex()],
-                            //     content: e.currentTarget.value
-                            //   };
-                            //   newRows[rowIndex()] = newRow;
-
-                            //   return newRows;
-                            // });
+                            setRows(rowIndex(), columnIndex(), 'content', e.currentTarget.value);
                           }}
                         />
                       </td>
