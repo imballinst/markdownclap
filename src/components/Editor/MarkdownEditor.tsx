@@ -77,8 +77,6 @@ export const MarkdownEditor = () => {
           selectionEnd + headingStr.length
         );
       });
-    } else {
-      console.info(e.currentTarget.selectionStart, e.currentTarget.selectionEnd);
     }
   };
 
