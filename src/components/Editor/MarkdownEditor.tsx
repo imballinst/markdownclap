@@ -8,11 +8,13 @@ import {
 } from '../../store/inspect';
 import './MarkdownEditor.css';
 import { useStore } from '@nanostores/solid';
-import { isKeycodeNumber } from '../../utils/key-parser';
+import { extractNumberFromCode } from '../../utils/key-parser';
 import { addHeading } from '../../utils/headings';
 import { ParsedStringResult, parseTableString } from '../../utils/operators/table';
 import { markdownStore, setMarkdown } from '../../store/markdown';
 import { setAlert } from '../../store/alert';
+import { modifyTextSelection, Toolbar } from './Toolbar';
+import { ToolbarAction } from '../../utils/operators/toolbar';
 
 export const MarkdownEditor = () => {
   const markdown = useStore(markdownStore);
@@ -44,12 +46,13 @@ export const MarkdownEditor = () => {
       return setMarkdown((prev) => prev + '  ');
     }
 
-    if (isKeycodeNumber(e.key) && e.altKey && e.ctrlKey) {
-      const number = Number(e.key);
+    const codeToNumber = extractNumberFromCode(e.code);
+
+    if (!isNaN(codeToNumber) && e.altKey && (e.ctrlKey || e.metaKey)) {
       const { selectionStart, selectionEnd } = e.currentTarget;
 
       return queueMicrotask(() => {
-        const headingStr = addHeading(number);
+        const headingStr = addHeading(codeToNumber);
 
         setMarkdown((currentValue) => {
           let lastNewlineIndex = selectionStart === 0 ? 0 : selectionStart - 1;
@@ -77,12 +80,44 @@ export const MarkdownEditor = () => {
           selectionEnd + headingStr.length
         );
       });
+    } else if (e.ctrlKey || e.metaKey) {
+      // Ctrl is for non-Mac, whereas metaKey is for Mac.
+      let action: ToolbarAction | undefined = undefined;
+
+      switch (e.key) {
+        case 'b': {
+          e.preventDefault();
+          action = ToolbarAction.TOGGLE_BOLD;
+          break;
+        }
+        case 'i': {
+          e.preventDefault();
+          action = ToolbarAction.TOGGLE_ITALIC;
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+
+      if (action) {
+        const result = modifyTextSelection({
+          action,
+          selected,
+          textAreaValue: markdown()
+        });
+        setSelected(result.selected);
+        setMarkdown(result.markdown);
+        textareaElement?.setSelectionRange(result.selected[0], result.selected[1]);
+      }
     }
   };
 
   return (
     <div class="flex flex-col mt-4">
-      <div class="flex justify-end">
+      <div class="flex justify-between">
+        <Toolbar selected={selected} setSelected={setSelected} textareaElement={textareaElement} />
+
         <button
           type="button"
           class="button-sm"
@@ -128,6 +163,14 @@ export const MarkdownEditor = () => {
         value={markdown()}
         onKeyDown={onKeyDown}
         onKeyUp={(e) => {
+          const { selectionStart, selectionEnd } = e.currentTarget;
+          if (selectionStart === selectionEnd) {
+            setSelected(undefined);
+          } else {
+            setSelected([selectionStart, selectionEnd]);
+          }
+        }}
+        onSelect={(e) => {
           const { selectionStart, selectionEnd } = e.currentTarget;
           if (selectionStart === selectionEnd) {
             setSelected(undefined);
