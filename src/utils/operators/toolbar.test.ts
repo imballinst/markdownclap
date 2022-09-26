@@ -2,96 +2,162 @@ import { describe, expect, test } from 'vitest';
 import { getTextFromAction, ToolbarAction } from './toolbar';
 
 describe('getTextFromAction', () => {
-  describe('singles', () => {
-    test('bold', () => {
-      const initial = 'test helloworld test';
-      let result = getTextFromAction({
-        action: ToolbarAction.TOGGLE_BOLD,
-        selectionStart: initial.indexOf('helloworld'),
+  test('headings', () => {
+    let initial = `
+test123
 
-        selectionEnd: initial.indexOf('helloworld') + 'helloworld'.length,
-        textAreaValue: initial
-      });
-
-      expect(result).toBe('test **helloworld** test');
-
-      // Revert back.
-      result = getTextFromAction({
-        action: ToolbarAction.TOGGLE_BOLD,
-        selectionStart: result.indexOf('helloworld'),
-        selectionEnd: result.indexOf('helloworld') + 'helloworld'.length,
-        textAreaValue: result
-      });
-
-      expect(result).toBe('test helloworld test');
+helloworld. This is a sample text
+    `.trim();
+    let result = getTextFromAction({
+      action: ToolbarAction.TOOLBAR_HEADING_1,
+      selectionEnd: initial.indexOf('3'),
+      selectionStart: initial.indexOf('3'),
+      textAreaValue: initial
     });
 
-    test('italic', () => {
-      const initial = 'test helloworld test';
-      let result = getTextFromAction({
-        action: ToolbarAction.TOGGLE_ITALIC,
-        selectionStart: initial.indexOf('helloworld'),
+    expect(result).toBe(
+      `
+# test123
 
-        selectionEnd: initial.indexOf('helloworld') + 'helloworld'.length,
-        textAreaValue: initial
-      });
+helloworld. This is a sample text
+    `.trim()
+    );
 
-      expect(result).toBe('test _helloworld_ test');
-
-      // Revert back.
-      result = getTextFromAction({
-        action: ToolbarAction.TOGGLE_ITALIC,
-        selectionStart: result.indexOf('helloworld'),
-        selectionEnd: result.indexOf('helloworld') + 'helloworld'.length,
-        textAreaValue: result
-      });
-
-      expect(result).toBe('test helloworld test');
+    // Try revert.
+    result = getTextFromAction({
+      action: ToolbarAction.TOOLBAR_HEADING_1,
+      selectionEnd: result.indexOf('3'),
+      selectionStart: result.indexOf('3'),
+      textAreaValue: result
     });
+
+    expect(result).toBe(initial);
+
+    // Try adding the heading again, this time heading 2.
+    result = getTextFromAction({
+      action: ToolbarAction.TOOLBAR_HEADING_2,
+      selectionEnd: result.indexOf('3'),
+      selectionStart: result.indexOf('3'),
+      textAreaValue: result
+    });
+
+    expect(result).toBe(
+      `
+## test123
+
+helloworld. This is a sample text
+    `.trim()
+    );
+
+    // Try adding heading 3, the previous heading should be replaced.
+    result = getTextFromAction({
+      action: ToolbarAction.TOOLBAR_HEADING_3,
+      selectionEnd: result.indexOf('3'),
+      selectionStart: result.indexOf('3'),
+      textAreaValue: result
+    });
+
+    expect(result).toBe(
+      `
+### test123
+
+helloworld. This is a sample text
+    `.trim()
+    );
   });
 
-  describe('couples', () => {
-    test('bold and italic', () => {
-      // Bold first.
-      const initial = 'test helloworld test';
-      let result = getTextFromAction({
-        action: ToolbarAction.TOGGLE_BOLD,
-        selectionStart: initial.indexOf('helloworld'),
+  describe('formattings', () => {
+    describe('singles', () => {
+      test('bold', () => {
+        const initial = 'test helloworld test';
+        let result = getTextFromAction({
+          action: ToolbarAction.TOGGLE_BOLD,
+          selectionStart: initial.indexOf('helloworld'),
 
-        selectionEnd: initial.indexOf('helloworld') + 'helloworld'.length,
-        textAreaValue: initial
+          selectionEnd: initial.indexOf('helloworld') + 'helloworld'.length,
+          textAreaValue: initial
+        });
+
+        expect(result).toBe('test **helloworld** test');
+
+        // Revert back.
+        result = getTextFromAction({
+          action: ToolbarAction.TOGGLE_BOLD,
+          selectionStart: result.indexOf('helloworld'),
+          selectionEnd: result.indexOf('helloworld') + 'helloworld'.length,
+          textAreaValue: result
+        });
+
+        expect(result).toBe('test helloworld test');
       });
 
-      expect(result).toBe('test **helloworld** test');
+      test('italic', () => {
+        const initial = 'test helloworld test';
+        let result = getTextFromAction({
+          action: ToolbarAction.TOGGLE_ITALIC,
+          selectionStart: initial.indexOf('helloworld'),
 
-      // Then, italic.
-      result = getTextFromAction({
-        action: ToolbarAction.TOGGLE_ITALIC,
-        selectionStart: result.indexOf('helloworld'),
-        selectionEnd: result.indexOf('helloworld') + 'helloworld'.length,
-        textAreaValue: result
+          selectionEnd: initial.indexOf('helloworld') + 'helloworld'.length,
+          textAreaValue: initial
+        });
+
+        expect(result).toBe('test _helloworld_ test');
+
+        // Revert back.
+        result = getTextFromAction({
+          action: ToolbarAction.TOGGLE_ITALIC,
+          selectionStart: result.indexOf('helloworld'),
+          selectionEnd: result.indexOf('helloworld') + 'helloworld'.length,
+          textAreaValue: result
+        });
+
+        expect(result).toBe('test helloworld test');
       });
+    });
 
-      expect(result).toBe('test **_helloworld_** test');
+    describe('couples', () => {
+      test('bold and italic', () => {
+        // Bold first.
+        const initial = 'test helloworld test';
+        let result = getTextFromAction({
+          action: ToolbarAction.TOGGLE_BOLD,
+          selectionStart: initial.indexOf('helloworld'),
 
-      // Revert back.
-      result = getTextFromAction({
-        action: ToolbarAction.TOGGLE_ITALIC,
-        selectionStart: result.indexOf('helloworld'),
-        selectionEnd: result.indexOf('helloworld') + 'helloworld'.length,
-        textAreaValue: result
+          selectionEnd: initial.indexOf('helloworld') + 'helloworld'.length,
+          textAreaValue: initial
+        });
+
+        expect(result).toBe('test **helloworld** test');
+
+        // Then, italic.
+        result = getTextFromAction({
+          action: ToolbarAction.TOGGLE_ITALIC,
+          selectionStart: result.indexOf('helloworld'),
+          selectionEnd: result.indexOf('helloworld') + 'helloworld'.length,
+          textAreaValue: result
+        });
+
+        expect(result).toBe('test **_helloworld_** test');
+
+        // Revert back.
+        result = getTextFromAction({
+          action: ToolbarAction.TOGGLE_ITALIC,
+          selectionStart: result.indexOf('helloworld'),
+          selectionEnd: result.indexOf('helloworld') + 'helloworld'.length,
+          textAreaValue: result
+        });
+
+        expect(result).toBe('test **helloworld** test');
+
+        result = getTextFromAction({
+          action: ToolbarAction.TOGGLE_BOLD,
+          selectionStart: result.indexOf('helloworld'),
+          selectionEnd: result.indexOf('helloworld') + 'helloworld'.length,
+          textAreaValue: result
+        });
+
+        expect(result).toBe(initial);
       });
-
-      expect(result).toBe('test **helloworld** test');
-
-      result = getTextFromAction({
-        action: ToolbarAction.TOGGLE_BOLD,
-        selectionStart: result.indexOf('helloworld'),
-        selectionEnd: result.indexOf('helloworld') + 'helloworld'.length,
-        textAreaValue: result
-      });
-
-      expect(result).toBe(initial);
     });
   });
 });
