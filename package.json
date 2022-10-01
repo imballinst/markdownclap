@@ -1,6 +1,6 @@
 {
   "name": "markdownclap",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "scripts": {
     "dev": "astro dev",
     "build": "VERSION=$(node scripts/get-pkg-version.js) GIT_HASH=$(git rev-parse --short HEAD) astro build",
