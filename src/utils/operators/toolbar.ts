@@ -39,18 +39,19 @@ export function getTextFromAction({
     case ToolbarAction.TOOLBAR_HEADING_4:
     case ToolbarAction.TOOLBAR_HEADING_5:
     case ToolbarAction.TOOLBAR_HEADING_6: {
-      let lastNewlineIndex = selectionStart === 0 ? 0 : selectionStart - 1;
+      let indexOfLineStart = selectionStart === 0 ? 0 : selectionStart - 1;
       let found = false;
 
-      while (!found && lastNewlineIndex > 0) {
-        if (newText.charAt(lastNewlineIndex) === '\n') {
+      while (!found && indexOfLineStart > 0) {
+        if (newText.charAt(indexOfLineStart) === '\n') {
+          indexOfLineStart += 1;
           found = true;
           break;
         }
-        lastNewlineIndex--;
+        indexOfLineStart--;
       }
 
-      let nextNewLine = newText.slice(lastNewlineIndex).indexOf('\n');
+      let nextNewLine = newText.indexOf('\n', indexOfLineStart);
       if (nextNewLine === -1) {
         // A full text without paragraph.
         // Make entire text the heading.
@@ -58,7 +59,7 @@ export function getTextFromAction({
       }
 
       const headingStr = `${action} `;
-      let substr = newText.slice(lastNewlineIndex, nextNewLine);
+      let substr = newText.slice(indexOfLineStart, nextNewLine);
 
       if (substr.startsWith(headingStr)) {
         // Heading exists, so we remove it.
@@ -73,7 +74,7 @@ export function getTextFromAction({
       }
 
       newText = newText
-        .slice(0, lastNewlineIndex)
+        .slice(0, indexOfLineStart)
         .concat(substr)
         .concat(newText.slice(nextNewLine));
 
