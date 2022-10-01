@@ -27,3 +27,21 @@
 .markdown-result > *:not(:first-child) {
   margin-top: theme('spacing.4');
 }
+
+.markdown-result > h1 {
+  font-size: theme('fontSize.3xl');
+}
+
+.markdown-result > h2 {
+  font-size: theme('fontSize.2xl');
+}
+
+.markdown-result > h3 {
+  font-size: theme('fontSize.xl');
+}
+
+.markdown-result > h4,
+.markdown-result > h5,
+.markdown-result > h6 {
+  font-size: theme('fontSize.lg');
+}

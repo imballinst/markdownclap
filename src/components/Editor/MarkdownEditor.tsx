@@ -8,20 +8,22 @@ import {
 } from '../../store/inspect';
 import './MarkdownEditor.css';
 import { useStore } from '@nanostores/solid';
-import { isKeycodeNumber } from '../../utils/key-parser';
-import { addHeading } from '../../utils/headings';
+import { extractNumberFromCode, isNumberHeadings } from '../../utils/key-parser';
 import { ParsedStringResult, parseTableString } from '../../utils/operators/table';
 import { markdownStore, setMarkdown } from '../../store/markdown';
 import { setAlert } from '../../store/alert';
+import { modifyTextSelection, Toolbar } from './Toolbar';
+import { ToolbarAction } from '../../utils/operators/toolbar';
 
 export const MarkdownEditor = () => {
   const markdown = useStore(markdownStore);
 
   const [selected, setSelected] = createSignal<[number, number] | undefined>(undefined);
   const [prevSelected, setPrevSelected] = createSignal<[number, number] | undefined>(undefined);
+  const [textAreaElement, setTextAreaElement] = createSignal<HTMLTextAreaElement | undefined>(
+    undefined
+  );
   const editor = useStore(inspectContentStore);
-
-  let textareaElement: HTMLTextAreaElement | undefined;
 
   createEffect<string | undefined>((previous) => {
     const rawContent = editor()?.rawContent;
@@ -44,64 +46,87 @@ export const MarkdownEditor = () => {
       return setMarkdown((prev) => prev + '  ');
     }
 
-    if (isKeycodeNumber(e.key) && e.altKey && e.ctrlKey) {
-      const number = Number(e.key);
-      const { selectionStart, selectionEnd } = e.currentTarget;
+    const codeToNumber = extractNumberFromCode(e.code);
 
-      return queueMicrotask(() => {
-        const headingStr = addHeading(number);
+    if (isNumberHeadings(codeToNumber) && e.altKey && (e.ctrlKey || e.metaKey)) {
+      // The combination is Ctrl/Cmd + Alt + 1-6.
+      const action: ToolbarAction = ToolbarAction[`TOOLBAR_HEADING_${codeToNumber}`];
 
-        setMarkdown((currentValue) => {
-          let lastNewlineIndex = selectionStart === 0 ? 0 : selectionStart - 1;
-          let found = false;
-
-          while (!found && lastNewlineIndex > 0) {
-            if (currentValue.charAt(lastNewlineIndex) === '\n') {
-              found = true;
-              break;
-            }
-            lastNewlineIndex--;
-          }
-
-          if (lastNewlineIndex === 0) {
-            return `${headingStr}${currentValue}`;
-          }
-
-          return currentValue
-            .slice(0, lastNewlineIndex + 1)
-            .concat(headingStr)
-            .concat(currentValue.slice(lastNewlineIndex + 1));
+      if (action) {
+        const result = modifyTextSelection({
+          action,
+          selected: [e.currentTarget.selectionStart, e.currentTarget.selectionEnd],
+          textAreaValue: markdown()
         });
-        textareaElement?.setSelectionRange(
-          selectionStart + headingStr.length,
-          selectionEnd + headingStr.length
-        );
-      });
+        setSelected(result.selected);
+        setMarkdown(result.markdown);
+        textAreaElement()?.setSelectionRange(result.selected[0], result.selected[1]);
+      }
+    } else if (e.ctrlKey || e.metaKey) {
+      // Ctrl is for non-Mac, whereas metaKey is for Mac.
+      let action: ToolbarAction | undefined = undefined;
+
+      switch (e.key) {
+        case 'b': {
+          e.preventDefault();
+          action = ToolbarAction.TOGGLE_BOLD;
+          break;
+        }
+        case 'i': {
+          e.preventDefault();
+          action = ToolbarAction.TOGGLE_ITALIC;
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+
+      if (action) {
+        const result = modifyTextSelection({
+          action,
+          selected: selected(),
+          textAreaValue: markdown()
+        });
+        setSelected(result.selected);
+        setMarkdown(result.markdown);
+        textAreaElement()?.setSelectionRange(result.selected[0], result.selected[1]);
+      }
     }
   };
 
+  function isInspectSelectionButtonDisabled() {
+    const selectedValue = selected();
+    if (!selectedValue) return true;
+
+    return selectedValue[0] === selectedValue[1];
+  }
+
   return (
     <div class="flex flex-col mt-4">
-      <div class="flex justify-end">
+      <div class="flex justify-between">
+        <Toolbar selected={selected} setSelected={setSelected} textAreaElement={textAreaElement} />
+
         <button
           type="button"
           class="button-sm"
-          disabled={selected() === undefined}
+          disabled={isInspectSelectionButtonDisabled()}
           onClick={() => {
+            const textArea = textAreaElement();
             let effectiveValue = markdown();
             let parseResult: ParsedStringResult = undefined;
             let selectionStart = 0;
             let selectionEnd = 0;
 
-            if (textareaElement) {
-              selectionStart = textareaElement.selectionStart;
-              selectionEnd = textareaElement.selectionEnd;
+            if (textArea) {
+              selectionStart = textArea.selectionStart;
+              selectionEnd = textArea.selectionEnd;
 
               effectiveValue = effectiveValue.slice(selectionStart, selectionEnd);
               parseResult = parseTableString(effectiveValue);
 
               // Remove the currently selected element.
-              textareaElement.setSelectionRange(0, 0);
+              textArea.setSelectionRange(0, 0);
             }
 
             if (parseResult === undefined) {
@@ -123,11 +148,19 @@ export const MarkdownEditor = () => {
         </button>
       </div>
       <textarea
-        ref={textareaElement}
+        ref={setTextAreaElement}
         class="markdown-editor"
         value={markdown()}
         onKeyDown={onKeyDown}
         onKeyUp={(e) => {
+          const { selectionStart, selectionEnd } = e.currentTarget;
+          if (selectionStart === selectionEnd) {
+            setSelected(undefined);
+          } else {
+            setSelected([selectionStart, selectionEnd]);
+          }
+        }}
+        onSelect={(e) => {
           const { selectionStart, selectionEnd } = e.currentTarget;
           if (selectionStart === selectionEnd) {
             setSelected(undefined);
