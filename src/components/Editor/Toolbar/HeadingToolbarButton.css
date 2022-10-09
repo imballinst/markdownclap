@@ -1,0 +1,4 @@
+.heading-toolbar-popover {
+  display: flex;
+  flex-direction: column;
+}

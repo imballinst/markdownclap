@@ -1,0 +1,22 @@
+.popover-root,
+.popover-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.popover-backdrop {
+  z-index: theme('zIndex.10');
+}
+
+.popover-dropdown {
+  position: absolute;
+  z-index: theme('zIndex.20');
+  padding: theme('spacing.2');
+  border-radius: theme('borderRadius.sm');
+  background: theme('backgroundColor.white');
+  box-shadow: theme('boxShadow.md');
+  outline: none;
+}

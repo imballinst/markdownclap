@@ -2,6 +2,8 @@ import { useStore } from '@nanostores/solid';
 import { Accessor, JSX, Setter } from 'solid-js';
 import { markdownStore, setMarkdown } from '../../../store/markdown';
 import { getTextFromAction, ToolbarAction } from '../../../utils/operators/toolbar';
+import { getToolbarHoverText } from './common';
+import { HeadingToolbarButton } from './HeadingToolbarButton';
 
 interface ToolbarProps {
   selected: Accessor<[number, number] | undefined>;
@@ -33,7 +35,7 @@ export function Toolbar({ selected, setSelected, textAreaElement }: ToolbarProps
     <div class="space-x-1">
       <button
         class="button-sm w-8"
-        title={getToolbarHoverText('Make selected text bold', ['b'])}
+        title={getToolbarHoverText('Bold', ['b'])}
         onClick={onButtonClick}
         data-action={ToolbarAction.TOGGLE_BOLD}
       >
@@ -41,12 +43,13 @@ export function Toolbar({ selected, setSelected, textAreaElement }: ToolbarProps
       </button>
       <button
         class="button-sm w-8"
-        title={getToolbarHoverText('Make selected text italic', ['i'])}
+        title={getToolbarHoverText('Italic', ['i'])}
         onClick={onButtonClick}
         data-action={ToolbarAction.TOGGLE_ITALIC}
       >
         I
       </button>
+      <HeadingToolbarButton onClick={onButtonClick} />
     </div>
   );
 }
@@ -95,11 +98,4 @@ export function modifyTextSelection({
     selected: [selectionStart + increment, selectionEnd + increment],
     markdown: result
   };
-}
-
-function getToolbarHoverText(defaultText: string, keys: string[]) {
-  if (typeof window === 'undefined') return '';
-
-  const metaKey = navigator.userAgent.includes('Macintosh') ? 'Cmd' : 'Ctrl';
-  return `${defaultText} (${metaKey}+${keys.join('+')})`;
 }
