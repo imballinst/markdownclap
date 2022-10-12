@@ -15,6 +15,7 @@
   position: absolute;
   z-index: theme('zIndex.20');
   padding: theme('spacing.2');
+  border: 1px solid theme('backgroundColor.slate.300');
   border-radius: theme('borderRadius.sm');
   background: theme('backgroundColor.white');
   box-shadow: theme('boxShadow.md');
