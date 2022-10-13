@@ -1,9 +1,13 @@
 import { createEffect, For } from 'solid-js';
-import { createStore } from 'solid-js/store';
+import { createStore, SetStoreFunction } from 'solid-js/store';
 import { JSX } from 'solid-js/jsx-runtime';
 import { setAlert } from '../../../../store/alert';
 import { patchInspectContent, setInspectStatus, InspectStatus } from '../../../../store/inspect';
-import { ParsedTableResult, getTableRawContent } from '../../../../utils/operators/table';
+import {
+  ParsedTableResult,
+  getTableRawContent,
+  ParsedColumn
+} from '../../../../utils/operators/table';
 import { HeaderButton } from './HeaderButton';
 import { Button } from '../../../Button';
 
@@ -11,6 +15,8 @@ const ARROW_UP_KEY = 'ArrowUp';
 const ARROW_DOWN_KEY = 'ArrowDown';
 const ARROW_LEFT_KEY = 'ArrowLeft';
 const ARROW_RIGHT_KEY = 'ArrowRight';
+
+const BACKSPACE_KEY = 'Backspace';
 
 export function TableInspector({ result }: { result: ParsedTableResult | undefined }) {
   if (result === undefined) {
@@ -25,31 +31,12 @@ export function TableInspector({ result }: { result: ParsedTableResult | undefin
     setRows(result.content.rows);
   });
 
-  function onArrowKeyPress(elementId: string, code: string) {
-    let [row, col] = elementId
+  const onInputKeyDown: JSX.EventHandlerUnion<HTMLInputElement, KeyboardEvent> = (e) => {
+    const [row, col] = e.currentTarget.id
       .slice('grid-cell-'.length)
       .split('-')
       .map((str) => Number(str));
 
-    if (code === ARROW_UP_KEY) {
-      row--;
-    } else if (code === ARROW_DOWN_KEY) {
-      row++;
-    } else if (code === ARROW_LEFT_KEY) {
-      col--;
-    } else if (code === ARROW_RIGHT_KEY) {
-      col++;
-    }
-
-    const nextElement = document.getElementById(
-      `grid-cell-${row}-${col}`
-    ) as HTMLInputElement | null;
-    if (nextElement) {
-      nextElement.focus();
-    }
-  }
-
-  const onInputKeyDown: JSX.EventHandlerUnion<HTMLInputElement, KeyboardEvent> = (e) => {
     if (
       (e.currentTarget.selectionStart === 0 &&
         (e.code === ARROW_UP_KEY || e.code === ARROW_LEFT_KEY)) ||
@@ -58,7 +45,9 @@ export function TableInspector({ result }: { result: ParsedTableResult | undefin
     ) {
       e.preventDefault();
 
-      onArrowKeyPress(e.currentTarget.id, e.code);
+      navigateCell({ row, col, code: e.code });
+    } else if (e.code === BACKSPACE_KEY) {
+      deleteRowIfEmpty({ setRows, row, col });
     }
   };
 
@@ -146,4 +135,61 @@ export function TableInspector({ result }: { result: ParsedTableResult | undefin
       </table>
     </div>
   );
+}
+
+// Helper functions.
+function deleteRowIfEmpty({
+  setRows,
+  row,
+  col
+}: {
+  setRows: SetStoreFunction<ParsedColumn[][]>;
+  row: number;
+  col: number;
+}) {
+  if (col > 0) return;
+
+  // This is because the row in the ID starts from 1 for table body.
+  // The row with ID 0 is reserved for table headers.
+  const rowIdx = row - 1;
+  setRows((prev) => {
+    // TODO: still need fixingin this part.
+    const length = prev[rowIdx].length;
+    const isRowEmpty = new Array(length).every((_, idx) => {
+      const html = document.getElementById(`grid-cell-${row}-${idx}`) as HTMLInputElement | null;
+      return html?.value === '';
+    });
+    console.info(prev[rowIdx], isRowEmpty);
+    if (!isRowEmpty) return prev;
+
+    const newRows = [...prev];
+    newRows.splice(rowIdx, 1);
+    return newRows;
+  });
+}
+
+function navigateCell({ code, row, col }: { code: string; row: number; col: number }) {
+  switch (code) {
+    case ARROW_UP_KEY: {
+      row--;
+      break;
+    }
+    case ARROW_DOWN_KEY: {
+      row++;
+      break;
+    }
+    case ARROW_LEFT_KEY: {
+      col--;
+      break;
+    }
+    case ARROW_RIGHT_KEY: {
+      col++;
+      break;
+    }
+  }
+
+  const nextElement = document.getElementById(`grid-cell-${row}-${col}`) as HTMLInputElement | null;
+  if (nextElement) {
+    nextElement.focus();
+  }
 }

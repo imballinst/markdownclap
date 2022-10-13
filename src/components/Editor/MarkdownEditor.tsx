@@ -154,6 +154,7 @@ export const MarkdownEditor = () => {
         value={markdown()}
         onKeyDown={onKeyDown}
         onKeyUp={(e) => {
+          // Using keyboard.
           const { selectionStart, selectionEnd } = e.currentTarget;
           if (selectionStart === selectionEnd) {
             setSelected(undefined);
@@ -161,7 +162,8 @@ export const MarkdownEditor = () => {
             setSelected([selectionStart, selectionEnd]);
           }
         }}
-        onSelect={(e) => {
+        onClick={(e) => {
+          // Using mouse.
           const { selectionStart, selectionEnd } = e.currentTarget;
           if (selectionStart === selectionEnd) {
             setSelected(undefined);
