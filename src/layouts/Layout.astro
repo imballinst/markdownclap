@@ -1,7 +1,7 @@
 ---
-import { Alert } from '../components/Alert/Alert';
+import { Alert } from '../components/Alert';
 import GitHub from '../components/Icons/GitHub.astro';
-import { Link } from '../components/Link/Link';
+import { Link } from '../components/Link';
 
 export interface Props {
   title: string;
@@ -121,7 +121,6 @@ if (import.meta.env.VERSION && import.meta.env.GIT_HASH) {
       :global(button[type='button']),
       :global(button[type='submit']),
       :global(button[type='reset']) {
-        padding: theme('spacing.2') theme('spacing.4');
         color: theme('colors.white');
         background: theme('colors.blue.600');
       }
@@ -137,12 +136,6 @@ if (import.meta.env.VERSION && import.meta.env.GIT_HASH) {
         --tw-ring-width: theme('ringWidth.2');
       }
 
-      :global(textarea) {
-        border-width: theme('borderWidth.DEFAULT');
-        border-color: theme('borderColor.slate.100');
-        font-family: monospace;
-      }
-
       :global(button.button-sm) {
         padding: theme('spacing.1') theme('spacing.2');
         border-width: 1px;
@@ -151,6 +144,12 @@ if (import.meta.env.VERSION && import.meta.env.GIT_HASH) {
       :global(button:disabled) {
         background: theme('colors.slate.400');
         color: theme('colors.slate.200');
+      }
+
+      :global(textarea) {
+        border-width: theme('borderWidth.DEFAULT');
+        border-color: theme('borderColor.slate.100');
+        font-family: monospace;
       }
     </style>
   </body>

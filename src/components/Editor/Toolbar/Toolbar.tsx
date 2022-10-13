@@ -1,27 +1,27 @@
-import { useStore } from '@nanostores/solid';
 import { Accessor, JSX, Setter } from 'solid-js';
-import { markdownStore, setMarkdown } from '../../../store/markdown';
+import { setMarkdown } from '../../../store/markdown';
 import { getTextFromAction, ToolbarAction } from '../../../utils/operators/toolbar';
+import { Button } from '../../Button';
+import { getToolbarHoverText } from './common';
+import { HeadingToolbarButton } from './HeadingToolbarButton';
 
 interface ToolbarProps {
-  selected: Accessor<[number, number] | undefined>;
   setSelected: Setter<[number, number] | undefined>;
   textAreaElement: Accessor<HTMLTextAreaElement | undefined>;
 }
 
-export function Toolbar({ selected, setSelected, textAreaElement }: ToolbarProps) {
-  const markdown = useStore(markdownStore);
-
+export function Toolbar({ setSelected, textAreaElement }: ToolbarProps) {
   const onButtonClick: JSX.DOMAttributes<HTMLButtonElement>['onClick'] = (event) => {
     const action = event.currentTarget.dataset['action'] as ToolbarAction;
-    const result = modifyTextSelection({
-      action,
-      selected: selected(),
-      textAreaValue: markdown()
-    });
     const textArea = textAreaElement();
 
     if (textArea) {
+      const result = modifyTextSelection({
+        action,
+        selected: [textArea.selectionStart, textArea.selectionEnd],
+        textAreaValue: textArea.value
+      });
+
       setSelected(result.selected);
       setMarkdown(result.markdown);
       textArea.setSelectionRange(result.selected[0], result.selected[1]);
@@ -31,22 +31,27 @@ export function Toolbar({ selected, setSelected, textAreaElement }: ToolbarProps
 
   return (
     <div class="space-x-1">
-      <button
-        class="button-sm w-8"
-        title={getToolbarHoverText('Make selected text bold', ['b'])}
+      <Button
+        variant="primary"
+        size="sm"
+        class="w-8"
+        title={getToolbarHoverText('Bold', ['b'])}
         onClick={onButtonClick}
         data-action={ToolbarAction.TOGGLE_BOLD}
       >
         B
-      </button>
-      <button
-        class="button-sm w-8"
-        title={getToolbarHoverText('Make selected text italic', ['i'])}
+      </Button>
+      <Button
+        variant="primary"
+        size="sm"
+        class="w-8"
+        title={getToolbarHoverText('Italic', ['i'])}
         onClick={onButtonClick}
         data-action={ToolbarAction.TOGGLE_ITALIC}
       >
         I
-      </button>
+      </Button>
+      <HeadingToolbarButton onClick={onButtonClick} />
     </div>
   );
 }
@@ -95,11 +100,4 @@ export function modifyTextSelection({
     selected: [selectionStart + increment, selectionEnd + increment],
     markdown: result
   };
-}
-
-function getToolbarHoverText(defaultText: string, keys: string[]) {
-  if (typeof window === 'undefined') return '';
-
-  const metaKey = navigator.userAgent.includes('Macintosh') ? 'Cmd' : 'Ctrl';
-  return `${defaultText} (${metaKey}+${keys.join('+')})`;
 }
