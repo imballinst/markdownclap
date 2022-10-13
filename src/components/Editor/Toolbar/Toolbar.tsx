@@ -1,30 +1,27 @@
-import { useStore } from '@nanostores/solid';
 import { Accessor, JSX, Setter } from 'solid-js';
-import { markdownStore, setMarkdown } from '../../../store/markdown';
+import { setMarkdown } from '../../../store/markdown';
 import { getTextFromAction, ToolbarAction } from '../../../utils/operators/toolbar';
 import { Button } from '../../Button';
 import { getToolbarHoverText } from './common';
 import { HeadingToolbarButton } from './HeadingToolbarButton';
 
 interface ToolbarProps {
-  selected: Accessor<[number, number] | undefined>;
   setSelected: Setter<[number, number] | undefined>;
   textAreaElement: Accessor<HTMLTextAreaElement | undefined>;
 }
 
-export function Toolbar({ selected, setSelected, textAreaElement }: ToolbarProps) {
-  const markdown = useStore(markdownStore);
-
+export function Toolbar({ setSelected, textAreaElement }: ToolbarProps) {
   const onButtonClick: JSX.DOMAttributes<HTMLButtonElement>['onClick'] = (event) => {
     const action = event.currentTarget.dataset['action'] as ToolbarAction;
-    const result = modifyTextSelection({
-      action,
-      selected: selected(),
-      textAreaValue: markdown()
-    });
     const textArea = textAreaElement();
 
     if (textArea) {
+      const result = modifyTextSelection({
+        action,
+        selected: [textArea.selectionStart, textArea.selectionEnd],
+        textAreaValue: textArea.value
+      });
+
       setSelected(result.selected);
       setMarkdown(result.markdown);
       textArea.setSelectionRange(result.selected[0], result.selected[1]);

@@ -106,7 +106,7 @@ export const MarkdownEditor = () => {
   return (
     <div class="flex flex-col mt-4">
       <div class="flex justify-between">
-        <Toolbar selected={selected} setSelected={setSelected} textAreaElement={textAreaElement} />
+        <Toolbar setSelected={setSelected} textAreaElement={textAreaElement} />
 
         <Button
           variant="primary"

@@ -1,12 +1,12 @@
 export enum ToolbarAction {
   TOGGLE_BOLD = '**',
   TOGGLE_ITALIC = '_',
-  TOOLBAR_HEADING_1 = '#',
-  TOOLBAR_HEADING_2 = '##',
-  TOOLBAR_HEADING_3 = '###',
-  TOOLBAR_HEADING_4 = '####',
-  TOOLBAR_HEADING_5 = '######',
-  TOOLBAR_HEADING_6 = '#######'
+  TOOLBAR_HEADING_1 = '# ',
+  TOOLBAR_HEADING_2 = '## ',
+  TOOLBAR_HEADING_3 = '### ',
+  TOOLBAR_HEADING_4 = '#### ',
+  TOOLBAR_HEADING_5 = '###### ',
+  TOOLBAR_HEADING_6 = '####### '
 }
 
 export function getTextFromAction({
@@ -58,19 +58,18 @@ export function getTextFromAction({
         nextNewLine = newText.length;
       }
 
-      const headingStr = `${action} `;
       let substr = newText.slice(indexOfLineStart, nextNewLine);
 
-      if (substr.startsWith(headingStr)) {
+      if (substr.startsWith(action)) {
         // Heading exists, so we remove it.
-        substr = substr.slice(headingStr.length);
+        substr = substr.slice(action.length);
       } else if (substr.startsWith('#')) {
         // Different heading level.
         // We replace.
-        substr = headingStr.concat(substr.slice(substr.indexOf(' ') + 1));
+        substr = action.concat(substr.slice(substr.indexOf(' ') + 1));
       } else {
         // Addition.
-        substr = `${headingStr}${substr}`;
+        substr = `${action}${substr}`;
       }
 
       newText = newText
