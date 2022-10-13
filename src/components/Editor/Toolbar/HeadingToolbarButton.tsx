@@ -5,6 +5,7 @@ import {
   useClientSideHotkeyHook
 } from '../../../hooks/useClientSideHotkeyHook';
 import { ToolbarAction } from '../../../utils/operators/toolbar';
+import { Button } from '../../Button';
 import { Popover, PopoverStyleState } from '../../Popover';
 
 import './HeadingToolbarButton.css';
@@ -33,8 +34,10 @@ export function HeadingToolbarButton({ onClick }: HeadingToolbarButtonProps) {
 
   return (
     <>
-      <button
-        class="button-sm w-8"
+      <Button
+        variant="primary"
+        size="sm"
+        class="w-8"
         title="Headings"
         onClick={(e) => {
           const rect = e.currentTarget.getBoundingClientRect();
@@ -43,7 +46,7 @@ export function HeadingToolbarButton({ onClick }: HeadingToolbarButtonProps) {
         }}
       >
         H
-      </button>
+      </Button>
 
       <Popover
         isVisible={isPopoverShown}
@@ -57,9 +60,14 @@ export function HeadingToolbarButton({ onClick }: HeadingToolbarButtonProps) {
           <For each={hotkeys()}>
             {(hotkey, index) => (
               <li>
-                <button class="button-sm" onClick={onClick} data-action={HOTKEYS[index()].action}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onClick}
+                  data-action={HOTKEYS[index()].action}
+                >
                   {hotkey}
-                </button>
+                </Button>
               </li>
             )}
           </For>

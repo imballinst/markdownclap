@@ -14,6 +14,7 @@ import { markdownStore, setMarkdown } from '../../store/markdown';
 import { setAlert } from '../../store/alert';
 import { modifyTextSelection, Toolbar } from './Toolbar';
 import { ToolbarAction } from '../../utils/operators/toolbar';
+import { Button } from '../Button';
 
 export const MarkdownEditor = () => {
   const markdown = useStore(markdownStore);
@@ -107,10 +108,10 @@ export const MarkdownEditor = () => {
       <div class="flex justify-between">
         <Toolbar selected={selected} setSelected={setSelected} textAreaElement={textAreaElement} />
 
-        <button
-          type="button"
-          class="button-sm"
-          disabled={isInspectSelectionButtonDisabled()}
+        <Button
+          variant="primary"
+          size="sm"
+          isDisabled={isInspectSelectionButtonDisabled}
           onClick={() => {
             const textArea = textAreaElement();
             let effectiveValue = markdown();
@@ -145,7 +146,7 @@ export const MarkdownEditor = () => {
           }}
         >
           Inspect selection
-        </button>
+        </Button>
       </div>
       <textarea
         ref={setTextAreaElement}

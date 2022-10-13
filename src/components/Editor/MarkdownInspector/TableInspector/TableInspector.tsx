@@ -5,6 +5,7 @@ import { setAlert } from '../../../../store/alert';
 import { patchInspectContent, setInspectStatus, InspectStatus } from '../../../../store/inspect';
 import { ParsedTableResult, getTableRawContent } from '../../../../utils/operators/table';
 import { HeaderButton } from './HeaderButton';
+import { Button } from '../../../Button';
 
 const ARROW_UP_KEY = 'ArrowUp';
 const ARROW_DOWN_KEY = 'ArrowDown';
@@ -63,8 +64,9 @@ export function TableInspector({ result }: { result: ParsedTableResult | undefin
 
   return (
     <div>
-      <button
-        class="button-sm"
+      <Button
+        variant="primary"
+        size="sm"
         onClick={() => {
           const content = {
             rows,
@@ -81,7 +83,7 @@ export function TableInspector({ result }: { result: ParsedTableResult | undefin
         }}
       >
         Save Changes
-      </button>
+      </Button>
 
       <table class="sidebar-table">
         <thead>

@@ -9,47 +9,65 @@
   --tw-ring-width: theme('ringWidth.2');
 }
 
-.button:disabled {
-  background: theme('colors.slate.400');
-  border-color: theme('colors.slate.400');
-  color: theme('colors.slate.200');
-}
-
 /* Variant styles. */
 /* Primary. */
-.button.button-primary {
+.button[data-variant='primary'] {
   color: theme('colors.white');
   background: theme('colors.blue.600');
   border-color: theme('colors.blue.600');
 }
 
-.button.button-primary:hover {
+.button[data-variant='primary']:hover {
   background: theme('colors.blue.700');
   border-color: theme('colors.blue.700');
 }
 
-.button.button-primary:focus {
+.button[data-variant='primary']:focus {
   --tw-ring-color: theme('ringColor.blue.500');
   --tw-ring-offset-width: theme('ringOffsetWidth.2');
   --tw-ring-width: theme('ringWidth.2');
 }
 
 /* Secondary. */
-.button.button-secondary {
+.button[data-variant='secondary'] {
   color: theme('colors.blue.500');
   background: none;
   border-color: theme('colors.blue.500');
 }
 
-.button.button-secondary:hover {
+.button[data-variant='secondary']:hover {
   background: theme('colors.blue.50');
 }
 
-.button.button-secondary:focus {
+.button[data-variant='secondary']:focus {
+  --tw-ring-color: theme('ringColor.blue.500');
+}
+
+/* Ghost. */
+.button[data-variant='ghost'] {
+  color: theme('colors.blue.500');
+  box-shadow: none;
+  background: none;
+  border-color: none;
+}
+
+.button[data-variant='ghost']:hover {
+  background: theme('colors.blue.50');
+}
+
+.button[data-variant='ghost']:focus {
   --tw-ring-color: theme('ringColor.blue.500');
 }
 
 /* Button sizes. */
-.button.button-sm {
+.button[data-size='sm'] {
   padding: theme('spacing.1') theme('spacing.2');
+}
+
+/* Disabled state. */
+.button[disabled=''],
+.button[disabled='']:hover {
+  background: theme('colors.slate.400');
+  border-color: theme('colors.slate.400');
+  color: theme('colors.slate.200');
 }

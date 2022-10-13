@@ -2,6 +2,7 @@ import { createSignal, Show } from 'solid-js';
 import { JSX } from 'solid-js/jsx-runtime';
 import { alterTable, ColumnContentType } from '../../../../store/inspect';
 import { ParsedColumn } from '../../../../utils/operators/table';
+import { Button } from '../../../Button';
 import { Popover, PopoverStyleState } from '../../../Popover';
 
 type ColumnActionsType =
@@ -72,9 +73,9 @@ export function HeaderButton({ columnIndex, headers }: HeaderButtonProps) {
   // Implementation especially for the WAI-ARIA thingy is heavily inspired by https://mui.com/material-ui/react-popover/.
   return (
     <>
-      <button
-        type="button"
-        class="secondary-button"
+      <Button
+        variant="secondary"
+        size="sm"
         onClick={(e) => {
           const rect = e.currentTarget.getBoundingClientRect();
           setPopoverStyle({ left: `${rect.left}px`, top: `${rect.top + rect.height}px` });
@@ -82,7 +83,7 @@ export function HeaderButton({ columnIndex, headers }: HeaderButtonProps) {
         }}
       >
         Actions
-      </button>
+      </Button>
 
       <Popover
         isVisible={isPopoverShown}
@@ -165,9 +166,9 @@ export function HeaderButton({ columnIndex, headers }: HeaderButtonProps) {
             </div>
           </Show>
 
-          <button type="submit" class="secondary-button text-xs">
+          <Button type="submit" variant="secondary" class="text-xs" size="sm">
             Submit
-          </button>
+          </Button>
         </form>
       </Popover>
     </>

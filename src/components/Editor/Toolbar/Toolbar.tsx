@@ -2,6 +2,7 @@ import { useStore } from '@nanostores/solid';
 import { Accessor, JSX, Setter } from 'solid-js';
 import { markdownStore, setMarkdown } from '../../../store/markdown';
 import { getTextFromAction, ToolbarAction } from '../../../utils/operators/toolbar';
+import { Button } from '../../Button';
 import { getToolbarHoverText } from './common';
 import { HeadingToolbarButton } from './HeadingToolbarButton';
 
@@ -33,22 +34,26 @@ export function Toolbar({ selected, setSelected, textAreaElement }: ToolbarProps
 
   return (
     <div class="space-x-1">
-      <button
-        class="button-sm w-8"
+      <Button
+        variant="primary"
+        size="sm"
+        class="w-8"
         title={getToolbarHoverText('Bold', ['b'])}
         onClick={onButtonClick}
         data-action={ToolbarAction.TOGGLE_BOLD}
       >
         B
-      </button>
-      <button
-        class="button-sm w-8"
+      </Button>
+      <Button
+        variant="primary"
+        size="sm"
+        class="w-8"
         title={getToolbarHoverText('Italic', ['i'])}
         onClick={onButtonClick}
         data-action={ToolbarAction.TOGGLE_ITALIC}
       >
         I
-      </button>
+      </Button>
       <HeadingToolbarButton onClick={onButtonClick} />
     </div>
   );
