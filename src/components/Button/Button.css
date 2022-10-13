@@ -1,0 +1,55 @@
+/* Base styles. */
+.button {
+  border-width: theme('borderWidth.DEFAULT');
+}
+
+.button:focus {
+  outline: none;
+  --tw-ring-offset-width: theme('ringOffsetWidth.2');
+  --tw-ring-width: theme('ringWidth.2');
+}
+
+.button:disabled {
+  background: theme('colors.slate.400');
+  border-color: theme('colors.slate.400');
+  color: theme('colors.slate.200');
+}
+
+/* Variant styles. */
+/* Primary. */
+.button.button-primary {
+  color: theme('colors.white');
+  background: theme('colors.blue.600');
+  border-color: theme('colors.blue.600');
+}
+
+.button.button-primary:hover {
+  background: theme('colors.blue.700');
+  border-color: theme('colors.blue.700');
+}
+
+.button.button-primary:focus {
+  --tw-ring-color: theme('ringColor.blue.500');
+  --tw-ring-offset-width: theme('ringOffsetWidth.2');
+  --tw-ring-width: theme('ringWidth.2');
+}
+
+/* Secondary. */
+.button.button-secondary {
+  color: theme('colors.blue.500');
+  background: none;
+  border-color: theme('colors.blue.500');
+}
+
+.button.button-secondary:hover {
+  background: theme('colors.blue.50');
+}
+
+.button.button-secondary:focus {
+  --tw-ring-color: theme('ringColor.blue.500');
+}
+
+/* Button sizes. */
+.button.button-sm {
+  padding: theme('spacing.1') theme('spacing.2');
+}
