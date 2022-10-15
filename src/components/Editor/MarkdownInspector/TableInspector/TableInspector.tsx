@@ -1,5 +1,5 @@
-import { createEffect, For } from 'solid-js';
-import { createStore, SetStoreFunction } from 'solid-js/store';
+import { createEffect, For, onMount } from 'solid-js';
+import { createStore } from 'solid-js/store';
 import { JSX } from 'solid-js/jsx-runtime';
 import { setAlert } from '../../../../store/alert';
 import { patchInspectContent, setInspectStatus, InspectStatus } from '../../../../store/inspect';
@@ -10,6 +10,8 @@ import {
 } from '../../../../utils/operators/table';
 import { HeaderButton } from './HeaderButton';
 import { Button } from '../../../Button';
+import { isCtrlOrCmdKey } from '../../../../utils/key-parser';
+import { getToolbarHoverText } from '../../Toolbar/common';
 
 const ARROW_UP_KEY = 'ArrowUp';
 const ARROW_DOWN_KEY = 'ArrowDown';
@@ -17,6 +19,7 @@ const ARROW_LEFT_KEY = 'ArrowLeft';
 const ARROW_RIGHT_KEY = 'ArrowRight';
 
 const BACKSPACE_KEY = 'Backspace';
+const ENTER_KEY = 'Enter';
 
 export function TableInspector({ result }: { result: ParsedTableResult | undefined }) {
   if (result === undefined) {
@@ -30,6 +33,26 @@ export function TableInspector({ result }: { result: ParsedTableResult | undefin
     setHeaders(result.content.headers);
     setRows(result.content.rows);
   });
+
+  // When mount, set focus to the input element.
+  onMount(() => {
+    focusElementIfExists(createTableColumnId(0, 0));
+  });
+
+  const onSaveChanges = () => {
+    const content = {
+      rows,
+      headers,
+      separators: result.content.separators
+    };
+
+    patchInspectContent({
+      content: content,
+      rawContent: getTableRawContent(content)
+    });
+    setInspectStatus(InspectStatus.PreviewingMarkdown);
+    setAlert({ message: 'Successfully applied changes.', type: 'info' });
+  };
 
   const onNonUpdatingKeydown: JSX.EventHandlerUnion<HTMLInputElement, KeyboardEvent> = (e) => {
     // This is a function that only affects keys that normally do not update an input.
@@ -64,30 +87,35 @@ export function TableInspector({ result }: { result: ParsedTableResult | undefin
       }
       // Set a new element to focus, if the row is deleted.
       if (nextFocusedElementId) focusElementIfExists(nextFocusedElementId);
+    } else if (e.key === ENTER_KEY) {
+      const isMetaKey = isCtrlOrCmdKey(e);
+      if (isMetaKey) {
+        // Save changes.
+        onSaveChanges();
+      } else {
+        // Create a new row, using the previous cell's `post` and `pre` value, to be consistent.
+        const nextRowIdx = rowIdx + 1;
+        setRows((prev) =>
+          prev
+            .slice(0, nextRowIdx)
+            .concat([
+              Array.from(new Array(prev[rowIdx].length), () => ({
+                content: '',
+                post: prev[rowIdx][colIdx].post,
+                pre: prev[rowIdx][colIdx].pre
+              }))
+            ])
+            .concat(prev.slice(nextRowIdx))
+        );
+        focusElementIfExists(createTableColumnId(nextRowIdx, colIdx));
+      }
     }
   };
 
   return (
     <div>
-      <Button
-        variant="primary"
-        size="sm"
-        onClick={() => {
-          const content = {
-            rows,
-            headers,
-            separators: result.content.separators
-          };
-
-          patchInspectContent({
-            content: content,
-            rawContent: getTableRawContent(content)
-          });
-          setInspectStatus(InspectStatus.PreviewingMarkdown);
-          setAlert({ message: 'Successfully applied changes.', type: 'info' });
-        }}
-      >
-        Save Changes
+      <Button variant="primary" size="sm" onClick={onSaveChanges} title={getToolbarHoverText({ keys: ['Enter'] })}>
+        Save changes
       </Button>
 
       <table class="sidebar-table">
@@ -126,6 +154,7 @@ export function TableInspector({ result }: { result: ParsedTableResult | undefin
           {
             <For each={rows} fallback={<div>Loading...</div>}>
               {(row, rowIndex) => {
+                console.info(row, rowIndex());
                 const columns = (
                   <For each={row} fallback={<div>Loading...</div>}>
                     {(column, columnIndex) => (

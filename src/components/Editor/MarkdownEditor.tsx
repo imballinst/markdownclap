@@ -8,13 +8,14 @@ import {
 } from '../../store/inspect';
 import './MarkdownEditor.css';
 import { useStore } from '@nanostores/solid';
-import { extractNumberFromKey, isNumberHeadings } from '../../utils/key-parser';
+import { extractNumberFromKey, isCtrlOrCmdKey, isNumberHeadings } from '../../utils/key-parser';
 import { ParsedStringResult, parseTableString } from '../../utils/operators/table';
 import { markdownStore, setMarkdown } from '../../store/markdown';
 import { setAlert } from '../../store/alert';
 import { modifyTextSelection, Toolbar } from './Toolbar';
 import { ToolbarAction } from '../../utils/operators/toolbar';
 import { Button } from '../Button';
+import { getToolbarHoverText } from './Toolbar/common';
 
 export const MarkdownEditor = () => {
   const markdown = useStore(markdownStore);
@@ -41,6 +42,39 @@ export const MarkdownEditor = () => {
     return rawContent;
   }, editor()?.rawContent);
 
+  const onInspectElement = () => {
+    const textArea = textAreaElement();
+    let effectiveValue = markdown();
+    let parseResult: ParsedStringResult = undefined;
+    let selectionStart = 0;
+    let selectionEnd = 0;
+
+    if (textArea) {
+      selectionStart = textArea.selectionStart;
+      selectionEnd = textArea.selectionEnd;
+
+      effectiveValue = effectiveValue.slice(selectionStart, selectionEnd);
+      parseResult = parseTableString(effectiveValue);
+
+      // Remove the currently selected element.
+      textArea.setSelectionRange(0, 0);
+    }
+
+    if (parseResult === undefined) {
+      setAlert({
+        message:
+          'Cannot inspect element: element is not supported yet for inspection or selections are invalid.',
+        type: 'error'
+      });
+      return;
+    }
+
+    setInspectContent(parseResult);
+    setInspectStatus(InspectStatus.InspectingSnippet);
+    setPrevSelected([selectionStart, selectionEnd]);
+    setSelected(undefined);
+  }
+
   const onKeyDown: JSX.TextareaHTMLAttributes<HTMLTextAreaElement>['onKeyDown'] = (e) => {
     const { selectionStart, selectionEnd } = e.currentTarget;
 
@@ -53,7 +87,7 @@ export const MarkdownEditor = () => {
 
     const codeToNumber = extractNumberFromKey(e.key);
 
-    if (isNumberHeadings(codeToNumber) && e.altKey && (e.ctrlKey || e.metaKey)) {
+    if (isNumberHeadings(codeToNumber) && e.altKey && isCtrlOrCmdKey(e)) {
       // The combination is Ctrl/Cmd + Alt + 1-6.
       const action: ToolbarAction = ToolbarAction[`TOOLBAR_HEADING_${codeToNumber}`];
 
@@ -67,7 +101,7 @@ export const MarkdownEditor = () => {
         setMarkdown(result.markdown);
         textAreaElement()?.setSelectionRange(result.selected[0], result.selected[1]);
       }
-    } else if (e.ctrlKey || e.metaKey) {
+    } else if (isCtrlOrCmdKey(e)) {
       // Ctrl is for non-Mac, whereas metaKey is for Mac.
       let action: ToolbarAction | undefined = undefined;
 
@@ -80,6 +114,11 @@ export const MarkdownEditor = () => {
         case 'i': {
           e.preventDefault();
           action = ToolbarAction.TOGGLE_ITALIC;
+          break;
+        }
+        case '`': {
+          e.preventDefault();
+          onInspectElement()
           break;
         }
         default: {
@@ -116,40 +155,10 @@ export const MarkdownEditor = () => {
           variant="primary"
           size="sm"
           isDisabled={isInspectSelectionButtonDisabled}
-          onClick={() => {
-            const textArea = textAreaElement();
-            let effectiveValue = markdown();
-            let parseResult: ParsedStringResult = undefined;
-            let selectionStart = 0;
-            let selectionEnd = 0;
-
-            if (textArea) {
-              selectionStart = textArea.selectionStart;
-              selectionEnd = textArea.selectionEnd;
-
-              effectiveValue = effectiveValue.slice(selectionStart, selectionEnd);
-              parseResult = parseTableString(effectiveValue);
-
-              // Remove the currently selected element.
-              textArea.setSelectionRange(0, 0);
-            }
-
-            if (parseResult === undefined) {
-              setAlert({
-                message:
-                  'Cannot inspect element: element is not supported yet for inspection or selections are invalid.',
-                type: 'error'
-              });
-              return;
-            }
-
-            setInspectContent(parseResult);
-            setInspectStatus(InspectStatus.InspectingSnippet);
-            setPrevSelected([selectionStart, selectionEnd]);
-            setSelected(undefined);
-          }}
+          title={getToolbarHoverText({ text: 'Inspect Element', keys: ['Shift', 'i'] })}
+          onClick={onInspectElement}
         >
-          Inspect selection
+          Inspect Element
         </Button>
       </div>
       <textarea
