@@ -1,5 +1,7 @@
 # Markdown Clap
 
+![Markdown Editor v0.2.0 showcase: deleting rows, re-ordering ordered columns, swapping columns.](./docs/markdowneditor-0.2.0.gif)
+
 Generally, updating Markdown is easy. We can just use our text editor or use a lot of online tools that allow Markdown previewing. However, one of the pain points that I felt when editing Markdown was when updating tables. When I need to remove a row with ordered numbers, I need to also update ALL ROWS below the deleted row. This is a chore and I think it is a room for improvement.
 
 ## Main Features
