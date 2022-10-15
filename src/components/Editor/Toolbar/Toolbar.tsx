@@ -35,7 +35,7 @@ export function Toolbar({ setSelected, textAreaElement }: ToolbarProps) {
         variant="primary"
         size="sm"
         class="w-8"
-        title={getToolbarHoverText('Bold', ['b'])}
+        title={getToolbarHoverText({ text: 'Bold', keys: ['b'] })}
         onClick={onButtonClick}
         data-action={ToolbarAction.TOGGLE_BOLD}
       >
@@ -45,7 +45,7 @@ export function Toolbar({ setSelected, textAreaElement }: ToolbarProps) {
         variant="primary"
         size="sm"
         class="w-8"
-        title={getToolbarHoverText('Italic', ['i'])}
+        title={getToolbarHoverText({ text: 'Italic', keys: ['i'] })}
         onClick={onButtonClick}
         data-action={ToolbarAction.TOGGLE_ITALIC}
       >

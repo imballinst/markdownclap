@@ -11,12 +11,12 @@ import { Popover, PopoverStyleState } from '../../Popover';
 import './HeadingToolbarButton.css';
 
 const HOTKEYS: HotkeyContainerObject[] = [
-  { defaultText: `Heading 1`, keys: [`1`], action: ToolbarAction.TOOLBAR_HEADING_1 },
-  { defaultText: `Heading 2`, keys: [`2`], action: ToolbarAction.TOOLBAR_HEADING_2 },
-  { defaultText: `Heading 3`, keys: [`3`], action: ToolbarAction.TOOLBAR_HEADING_3 },
-  { defaultText: `Heading 4`, keys: [`4`], action: ToolbarAction.TOOLBAR_HEADING_4 },
-  { defaultText: `Heading 5`, keys: [`5`], action: ToolbarAction.TOOLBAR_HEADING_5 },
-  { defaultText: `Heading 6`, keys: [`6`], action: ToolbarAction.TOOLBAR_HEADING_6 }
+  { defaultText: `Heading 1`, keys: ['Alt', '1'], action: ToolbarAction.TOOLBAR_HEADING_1 },
+  { defaultText: `Heading 2`, keys: ['Alt', '2'], action: ToolbarAction.TOOLBAR_HEADING_2 },
+  { defaultText: `Heading 3`, keys: ['Alt', '3'], action: ToolbarAction.TOOLBAR_HEADING_3 },
+  { defaultText: `Heading 4`, keys: ['Alt', '4'], action: ToolbarAction.TOOLBAR_HEADING_4 },
+  { defaultText: `Heading 5`, keys: ['Alt', '5'], action: ToolbarAction.TOOLBAR_HEADING_5 },
+  { defaultText: `Heading 6`, keys: ['Alt', '6'], action: ToolbarAction.TOOLBAR_HEADING_6 }
 ];
 
 interface HeadingToolbarButtonProps {
@@ -66,7 +66,7 @@ export function HeadingToolbarButton({ onClick }: HeadingToolbarButtonProps) {
                   onClick={onClick}
                   data-action={HOTKEYS[index()].action}
                 >
-                  {hotkey}
+                  {hotkey.buttonText} ({hotkey.buttonTitle})
                 </Button>
               </li>
             )}

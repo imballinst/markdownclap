@@ -4,24 +4,41 @@ import { getToolbarHoverText } from '../components/Editor/Toolbar/common';
 export interface HotkeyContainerObject {
   defaultText: string;
   keys: string[];
-  action: string;
+  action?: string;
+}
+
+interface UseClientSideHotkeyHookResult {
+  buttonText: string;
+  buttonTitle: string;
 }
 
 export function useClientSideHotkeyHook<T extends HotkeyContainerObject>(
   defaultValue: T
-): Accessor<string>;
+): Accessor<UseClientSideHotkeyHookResult>;
 export function useClientSideHotkeyHook<T extends HotkeyContainerObject>(
   defaultValue: T[]
-): Accessor<string[]>;
+): Accessor<UseClientSideHotkeyHookResult[]>;
 
 export function useClientSideHotkeyHook<T extends HotkeyContainerObject>(defaultValue: T | T[]) {
-  const [value, setValue] = createSignal(Array.isArray(defaultValue) ? ([] as string[]) : '');
+  const [value, setValue] = createSignal<UseClientSideHotkeyHookResult | UseClientSideHotkeyHookResult[]>(Array.isArray(defaultValue) ? (defaultValue.map(item => ({
+    buttonText: item.defaultText,
+    buttonTitle: ''
+  }))) : {
+    buttonText: defaultValue.defaultText,
+    buttonTitle: ''
+  });
 
   onMount(() => {
     if (Array.isArray(defaultValue)) {
-      setValue(defaultValue.map((item) => getToolbarHoverText(item.defaultText, item.keys)));
+      setValue(defaultValue.map((item) => ({
+        buttonText: item.defaultText,
+        buttonTitle: getToolbarHoverText({ keys: item.keys})
+      })));
     } else {
-      setValue(getToolbarHoverText(defaultValue.defaultText, defaultValue.keys));
+      setValue({
+        buttonText: defaultValue.defaultText,
+        buttonTitle: getToolbarHoverText({ keys: defaultValue.keys})
+      });
     }
   });
 
