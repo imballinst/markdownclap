@@ -1,5 +1,9 @@
 /* Base styles. */
 .button {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   border-width: theme('borderWidth.DEFAULT');
 }
 
@@ -13,6 +17,7 @@
 /* Primary. */
 .button[data-variant='primary'] {
   color: theme('colors.white');
+  fill: theme('colors.white');
   background: theme('colors.blue.600');
   border-color: theme('colors.blue.600');
 }
@@ -31,6 +36,7 @@
 /* Secondary. */
 .button[data-variant='secondary'] {
   color: theme('colors.blue.500');
+  fill: theme('colors.blue.500');
   background: none;
   border-color: theme('colors.blue.500');
 }
@@ -46,6 +52,7 @@
 /* Ghost. */
 .button[data-variant='ghost'] {
   color: theme('colors.blue.500');
+  fill: theme('colors.blue.500');
   box-shadow: none;
   background: none;
   border-color: none;
@@ -70,4 +77,5 @@
   background: theme('colors.slate.400');
   border-color: theme('colors.slate.400');
   color: theme('colors.slate.200');
+  fill: theme('colors.slate.200');
 }

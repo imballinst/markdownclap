@@ -4,6 +4,8 @@ import { getTextFromAction, ToolbarAction } from '../../../utils/operators/toolb
 import { Button } from '../../Button';
 import { getToolbarHoverText } from './common';
 import { HeadingToolbarButton } from './HeadingToolbarButton';
+import { CSVIcon } from '../../Icons/CSV';
+import { CSVToolbarButton } from './CSVToolbarButton';
 
 interface ToolbarProps {
   setSelected: Setter<[number, number] | undefined>;
@@ -30,7 +32,7 @@ export function Toolbar({ setSelected, textAreaElement }: ToolbarProps) {
   };
 
   return (
-    <div class="space-x-1">
+    <div class="flex space-x-1">
       <Button
         variant="primary"
         size="sm"
@@ -52,6 +54,8 @@ export function Toolbar({ setSelected, textAreaElement }: ToolbarProps) {
         I
       </Button>
       <HeadingToolbarButton onClick={onButtonClick} />
+
+      <CSVToolbarButton textAreaElement={textAreaElement} />
     </div>
   );
 }
