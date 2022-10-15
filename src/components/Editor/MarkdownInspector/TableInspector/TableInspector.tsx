@@ -118,7 +118,7 @@ export function TableInspector({ result }: { result: ParsedTableResult | undefin
                           value={column.content}
                           id={`grid-cell-${rowIndex() + 1}-${columnIndex()}`}
                           onKeyDown={onInputKeyDown}
-                          onChange={(e) => {
+                          onInput={(e) => {
                             setRows(rowIndex(), columnIndex(), 'content', e.currentTarget.value);
                           }}
                         />

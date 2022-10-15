@@ -8,7 +8,7 @@ import {
 } from '../../store/inspect';
 import './MarkdownEditor.css';
 import { useStore } from '@nanostores/solid';
-import { extractNumberFromCode, isNumberHeadings } from '../../utils/key-parser';
+import { extractNumberFromKey, isNumberHeadings } from '../../utils/key-parser';
 import { ParsedStringResult, parseTableString } from '../../utils/operators/table';
 import { markdownStore, setMarkdown } from '../../store/markdown';
 import { setAlert } from '../../store/alert';
@@ -42,12 +42,16 @@ export const MarkdownEditor = () => {
   }, editor()?.rawContent);
 
   const onKeyDown: JSX.TextareaHTMLAttributes<HTMLTextAreaElement>['onKeyDown'] = (e) => {
-    if (e.code === 'Tab') {
+    const { selectionStart, selectionEnd } = e.currentTarget;
+
+    if (e.key === 'Tab' && selectionStart === selectionEnd) {
       e.preventDefault();
-      return setMarkdown((prev) => prev + '  ');
+      setMarkdown((prev) => prev.slice(0, selectionStart) + '  ' + prev.slice(selectionStart + 1));
+      e.currentTarget.setSelectionRange(selectionStart + 2, selectionEnd + 2);
+      return;
     }
 
-    const codeToNumber = extractNumberFromCode(e.code);
+    const codeToNumber = extractNumberFromKey(e.key);
 
     if (isNumberHeadings(codeToNumber) && e.altKey && (e.ctrlKey || e.metaKey)) {
       // The combination is Ctrl/Cmd + Alt + 1-6.
@@ -56,7 +60,7 @@ export const MarkdownEditor = () => {
       if (action) {
         const result = modifyTextSelection({
           action,
-          selected: [e.currentTarget.selectionStart, e.currentTarget.selectionEnd],
+          selected: [selectionStart, selectionEnd],
           textAreaValue: markdown()
         });
         setSelected(result.selected);
