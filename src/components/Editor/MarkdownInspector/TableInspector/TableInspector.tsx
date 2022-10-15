@@ -31,23 +31,39 @@ export function TableInspector({ result }: { result: ParsedTableResult | undefin
     setRows(result.content.rows);
   });
 
-  const onInputKeyDown: JSX.EventHandlerUnion<HTMLInputElement, KeyboardEvent> = (e) => {
-    const [row, col] = e.currentTarget.id
-      .slice('grid-cell-'.length)
-      .split('-')
-      .map((str) => Number(str));
+  const onNonUpdatingKeydown: JSX.EventHandlerUnion<HTMLInputElement, KeyboardEvent> = (e) => {
+    // This is a function that only affects keys that normally do not update an input.
+    // For example, arrow keys.
+    const { colIdx, rowIdx } = parseTableColumnId(e.currentTarget.id);
 
     if (
       (e.currentTarget.selectionStart === 0 &&
-        (e.code === ARROW_UP_KEY || e.code === ARROW_LEFT_KEY)) ||
+        (e.key === ARROW_UP_KEY || e.key === ARROW_LEFT_KEY)) ||
       (e.currentTarget.selectionStart === e.currentTarget.value.length &&
-        (e.code === ARROW_DOWN_KEY || e.code === ARROW_RIGHT_KEY))
+        (e.key === ARROW_DOWN_KEY || e.key === ARROW_RIGHT_KEY))
     ) {
       e.preventDefault();
 
-      navigateCell({ row, col, code: e.code });
-    } else if (e.code === BACKSPACE_KEY) {
-      deleteRowIfEmpty({ setRows, row, col });
+      navigateCell({ rowIdx, colIdx, key: e.key });
+    } else if (e.key === BACKSPACE_KEY) {
+      const { shouldPreventEvent, deletedRowIdx, nextFocusedElementId } = deleteRowIfEmpty({
+        rows,
+        rowIdx,
+        colIdx
+      });
+
+      // Prevent default to prevent deleting the key in the next "focused" input.
+      if (shouldPreventEvent) e.preventDefault();
+      // Delete the row, if the row is empty.
+      if (deletedRowIdx) {
+        setRows((prev) => {
+          const newRows = [...prev];
+          newRows.splice(deletedRowIdx, 1);
+          return newRows;
+        });
+      }
+      // Set a new element to focus, if the row is deleted.
+      if (nextFocusedElementId) focusElementIfExists(nextFocusedElementId);
     }
   };
 
@@ -88,9 +104,9 @@ export function TableInspector({ result }: { result: ParsedTableResult | undefin
               <th>
                 <input
                   value={header.content}
-                  id={`grid-cell-0-${index}`}
-                  onKeyDown={onInputKeyDown}
-                  onChange={(e) => {
+                  id={createTableColumnId(-1, index)}
+                  onKeyDown={onNonUpdatingKeydown}
+                  onInput={(e) => {
                     setHeaders((prev) => {
                       const newHeaders = [...prev];
                       newHeaders[index] = {
@@ -116,8 +132,8 @@ export function TableInspector({ result }: { result: ParsedTableResult | undefin
                       <td>
                         <input
                           value={column.content}
-                          id={`grid-cell-${rowIndex() + 1}-${columnIndex()}`}
-                          onKeyDown={onInputKeyDown}
+                          id={createTableColumnId(rowIndex(), columnIndex())}
+                          onKeyDown={onNonUpdatingKeydown}
                           onInput={(e) => {
                             setRows(rowIndex(), columnIndex(), 'content', e.currentTarget.value);
                           }}
@@ -139,56 +155,77 @@ export function TableInspector({ result }: { result: ParsedTableResult | undefin
 
 // Helper functions.
 function deleteRowIfEmpty({
-  setRows,
-  row,
-  col
+  rows,
+  rowIdx,
+  colIdx
 }: {
-  setRows: SetStoreFunction<ParsedColumn[][]>;
-  row: number;
-  col: number;
-}) {
-  if (col > 0) return;
+  rows: ParsedColumn[][];
+  rowIdx: number;
+  colIdx: number;
+}): { shouldPreventEvent: boolean; nextFocusedElementId?: string; deletedRowIdx?: number } {
+  // Return early if it's on headers or on the first row.
+  if (rowIdx === -1 || rows.length === 1) return { shouldPreventEvent: false };
 
-  // This is because the row in the ID starts from 1 for table body.
-  // The row with ID 0 is reserved for table headers.
-  const rowIdx = row - 1;
-  setRows((prev) => {
-    // TODO: still need fixingin this part.
-    const length = prev[rowIdx].length;
-    const isRowEmpty = new Array(length).every((_, idx) => {
-      const html = document.getElementById(`grid-cell-${row}-${idx}`) as HTMLInputElement | null;
-      return html?.value === '';
-    });
-    console.info(prev[rowIdx], isRowEmpty);
-    if (!isRowEmpty) return prev;
+  if (colIdx > 0 && rows[rowIdx][colIdx].content === '') {
+    return {
+      shouldPreventEvent: true,
+      nextFocusedElementId: createTableColumnId(rowIdx, colIdx - 1)
+    };
+  }
 
-    const newRows = [...prev];
-    newRows.splice(rowIdx, 1);
-    return newRows;
-  });
+  const isRowEmpty = rows[rowIdx].every((column) => column.content === '');
+  let nextFocusedElementId: string | undefined;
+  let deletedRowIdx: number | undefined;
+
+  if (isRowEmpty) {
+    deletedRowIdx = rowIdx;
+
+    const prevRowIdx = rowIdx - 1;
+    nextFocusedElementId = createTableColumnId(prevRowIdx, rows[prevRowIdx].length - 1);
+  }
+
+  return { shouldPreventEvent: isRowEmpty, nextFocusedElementId, deletedRowIdx };
 }
 
-function navigateCell({ code, row, col }: { code: string; row: number; col: number }) {
-  switch (code) {
+function navigateCell({ key, rowIdx, colIdx }: { key: string; rowIdx: number; colIdx: number }) {
+  switch (key) {
     case ARROW_UP_KEY: {
-      row--;
+      rowIdx--;
       break;
     }
     case ARROW_DOWN_KEY: {
-      row++;
+      rowIdx++;
       break;
     }
     case ARROW_LEFT_KEY: {
-      col--;
+      colIdx--;
       break;
     }
     case ARROW_RIGHT_KEY: {
-      col++;
+      colIdx++;
       break;
     }
   }
 
-  const nextElement = document.getElementById(`grid-cell-${row}-${col}`) as HTMLInputElement | null;
+  focusElementIfExists(createTableColumnId(rowIdx, colIdx));
+}
+
+const ID_SEPARATOR = '--';
+
+function parseTableColumnId(id: string) {
+  const [_, rowIdx, colIdx] = id.split(ID_SEPARATOR);
+  return {
+    rowIdx: Number(rowIdx),
+    colIdx: Number(colIdx)
+  };
+}
+
+function createTableColumnId(rowIdx: number, columnIdx: number) {
+  return ['cell', rowIdx, columnIdx].join(ID_SEPARATOR);
+}
+
+function focusElementIfExists(id: string) {
+  const nextElement = document.getElementById(id) as HTMLInputElement | null;
   if (nextElement) {
     nextElement.focus();
   }
