@@ -1,5 +1,4 @@
 import { useStore } from '@nanostores/solid';
-import { Portal, Show } from 'solid-js/web';
 import { createEffect, createSignal } from 'solid-js';
 import classnames from 'classnames';
 
@@ -21,16 +20,14 @@ export function Alert() {
   });
 
   return (
-    <Portal>
-      <div
-        role="presentation"
-        class={classnames(`alert-root ${alertClass()}`, {
-          'alert-info': alertContent()?.type === 'info',
-          'alert-error': alertContent()?.type === 'error'
-        })}
-      >
-        {alertContent()?.message}
-      </div>
-    </Portal>
+    <div
+      role="presentation"
+      class={classnames(`alert-root ${alertClass()}`, {
+        'alert-info': alertContent()?.type === 'info',
+        'alert-error': alertContent()?.type === 'error'
+      })}
+    >
+      {alertContent()?.message}
+    </div>
   );
 }
