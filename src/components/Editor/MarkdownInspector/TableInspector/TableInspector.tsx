@@ -114,7 +114,12 @@ export function TableInspector({ result }: { result: ParsedTableResult | undefin
 
   return (
     <div>
-      <Button variant="primary" size="sm" onClick={onSaveChanges} title={getToolbarHoverText({ keys: ['Enter'] })}>
+      <Button
+        variant="primary"
+        size="sm"
+        onClick={onSaveChanges}
+        title={getToolbarHoverText({ keys: ['Enter'] })}
+      >
         Save changes
       </Button>
 
@@ -154,7 +159,6 @@ export function TableInspector({ result }: { result: ParsedTableResult | undefin
           {
             <For each={rows} fallback={<div>Loading...</div>}>
               {(row, rowIndex) => {
-                console.info(row, rowIndex());
                 const columns = (
                   <For each={row} fallback={<div>Loading...</div>}>
                     {(column, columnIndex) => (
