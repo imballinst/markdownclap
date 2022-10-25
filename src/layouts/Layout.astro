@@ -2,13 +2,14 @@
 import { Alert } from '../components/Alert';
 import GitHub from '../components/Icons/GitHub.astro';
 import { Link } from '../components/Link';
+import { trimSlashes } from '../utils/string';
 
 export interface Props {
   title: string;
 }
 
 const { title } = Astro.props as Props;
-const origin = Astro.site?.href || ''
+const origin = (Astro.site?.href || '') + trimSlashes(import.meta.env.BASE_PATH || '')
 
 const date = new Date();
 const currentYear = date.getUTCFullYear().toString().padStart(2, '0');
@@ -36,17 +37,17 @@ if (import.meta.env.VERSION && import.meta.env.GIT_HASH) {
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://imballinst.github.io/markdownclap/">
+    <meta property="og:url" content={origin}>
     <meta property="og:title" content={title}>
     <meta property="og:description" content="Update Markdown tables and many others easier with Markdown Clap.">
-    <meta property="og:image" content={origin + "markdownclap-big.png"}>
+    <meta property="og:image" content={origin + "/markdownclap-big.png"}>
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://imballinst.github.io/markdownclap/">
+    <meta property="twitter:url" content={origin}>
     <meta property="twitter:title" content={title}>
     <meta property="twitter:description" content="Update Markdown tables and many others easier with Markdown Clap.">
-    <meta property="twitter:image" content={origin + "markdownclap-big.png"}>
+    <meta property="twitter:image" content={origin + "/markdownclap-big.png"}>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
