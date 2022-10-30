@@ -9,6 +9,8 @@ Generally, updating Markdown is easy. We can just use our text editor or use a l
 1. Markdown preview
 2. Markdown inspection, with supported elements including:
    1. Tables
+3. Import CSV file into Markdown table
+4. Paste cells from other source of spreadsheet as Markdown table
 
 ## Development
 
