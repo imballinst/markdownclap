@@ -202,6 +202,9 @@ export const MarkdownEditor = () => {
             setMarkdown((prev) =>
               prev.slice(0, selectionStart).concat(parseResult).concat(prev.slice(selectionStart))
             );
+
+            const nextSelectionRange = selectionStart + parseResult.length;
+            e.currentTarget.setSelectionRange(nextSelectionRange, nextSelectionRange);
           }
         }}
       />
