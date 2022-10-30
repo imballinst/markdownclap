@@ -10,7 +10,7 @@ import {
 } from '../../../../utils/operators/table';
 import { HeaderButton } from './HeaderButton';
 import { Button } from '../../../Button';
-import { isCtrlOrCmdKey } from '../../../../utils/key-parser';
+import { isCtrlOrCmdKey } from '../../../../utils/parsers/keycode';
 import { getToolbarHoverText } from '../../Toolbar/common';
 
 const ARROW_UP_KEY = 'ArrowUp';

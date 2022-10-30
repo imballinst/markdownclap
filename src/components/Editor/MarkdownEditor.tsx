@@ -8,7 +8,11 @@ import {
 } from '../../store/inspect';
 import './MarkdownEditor.css';
 import { useStore } from '@nanostores/solid';
-import { extractNumberFromKey, isCtrlOrCmdKey, isNumberHeadings } from '../../utils/key-parser';
+import {
+  extractNumberFromKey,
+  isCtrlOrCmdKey,
+  isNumberHeadings
+} from '../../utils/parsers/keycode';
 import { ParsedStringResult, parseTableString } from '../../utils/operators/table';
 import { markdownStore, setMarkdown } from '../../store/markdown';
 import { setAlert } from '../../store/alert';
@@ -16,6 +20,7 @@ import { modifyTextSelection, Toolbar } from './Toolbar';
 import { ToolbarAction } from '../../utils/operators/toolbar';
 import { Button } from '../Button';
 import { getToolbarHoverText } from './Toolbar/common';
+import { parseTableFromTabbedText } from '../../utils/parsers/table';
 
 export const MarkdownEditor = () => {
   const markdown = useStore(markdownStore);
@@ -73,7 +78,7 @@ export const MarkdownEditor = () => {
     setInspectStatus(InspectStatus.InspectingSnippet);
     setPrevSelected([selectionStart, selectionEnd]);
     setSelected(undefined);
-  }
+  };
 
   const onKeyDown: JSX.TextareaHTMLAttributes<HTMLTextAreaElement>['onKeyDown'] = (e) => {
     const { selectionStart, selectionEnd } = e.currentTarget;
@@ -118,7 +123,7 @@ export const MarkdownEditor = () => {
         }
         case '`': {
           e.preventDefault();
-          onInspectElement()
+          onInspectElement();
           break;
         }
         default: {
@@ -185,7 +190,19 @@ export const MarkdownEditor = () => {
           }
         }}
         onInput={(e) => {
-          setMarkdown(e.currentTarget.value ?? '');
+          const nextValue = e.currentTarget.value ?? '';
+          setMarkdown(nextValue);
+        }}
+        onPaste={(e) => {
+          e.preventDefault();
+          const pasted = e.clipboardData?.getData('text/plain');
+          const parseResult = parseTableFromTabbedText(pasted);
+          if (parseResult) {
+            const selectionStart = e.currentTarget.selectionStart;
+            setMarkdown((prev) =>
+              prev.slice(0, selectionStart).concat(parseResult).concat(prev.slice(selectionStart))
+            );
+          }
         }}
       />
     </div>
