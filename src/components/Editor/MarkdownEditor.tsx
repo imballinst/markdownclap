@@ -194,10 +194,10 @@ export const MarkdownEditor = () => {
           setMarkdown(nextValue);
         }}
         onPaste={(e) => {
-          e.preventDefault();
           const pasted = e.clipboardData?.getData('text/plain');
           const parseResult = parseTableFromTabbedText(pasted);
           if (parseResult) {
+            e.preventDefault();
             const selectionStart = e.currentTarget.selectionStart;
             setMarkdown((prev) =>
               prev.slice(0, selectionStart).concat(parseResult).concat(prev.slice(selectionStart))

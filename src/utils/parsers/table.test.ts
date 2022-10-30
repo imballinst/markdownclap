@@ -18,7 +18,7 @@ describe('parseTableFromTabbedText', () => {
     const str = `
 hello\tworld
 this is an invalid table
-    `.trim()
+    `
 
     expect(parseTableFromTabbedText(str)).toBe(undefined)
   })
@@ -27,7 +27,19 @@ this is an invalid table
     const str = `
 hello\tworld
 this is a valid table\they!
-    `.trim()
+    `
+
+    expect(parseTableFromTabbedText(str)).toBe(`
+|hello|world|
+|this is a valid table|hey!|
+    `.trim())
+  })
+
+  test('valid case: with trailing newline', () => {
+    const str = `
+hello\tworld
+this is a valid table\they!
+    `
 
     expect(parseTableFromTabbedText(str)).toBe(`
 |hello|world|
@@ -39,7 +51,7 @@ this is a valid table\they!
     const str = `
 hello\tworld
 this is a | valid table\they!
-    `.trim()
+    `
 
     expect(parseTableFromTabbedText(str)).toBe(`
 |hello|world|
