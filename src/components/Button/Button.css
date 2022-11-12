@@ -73,7 +73,9 @@
 
 /* Disabled state. */
 .button[disabled=''],
-.button[disabled='']:hover {
+.button[disabled='']:hover,
+.button:disabled,
+.button:disabled:hover {
   background: theme('colors.slate.400');
   border-color: theme('colors.slate.400');
   color: theme('colors.slate.200');

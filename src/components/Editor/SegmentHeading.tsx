@@ -8,9 +8,9 @@ interface SegmentHeadingProps {
 
 export function SegmentHeading(props: SegmentHeadingProps) {
   return (
-    <div>
-      <div class="segment-heading">{props.title}</div>
-      <div class="segment-subtext">{props.children}</div>
-    </div>
+    <>
+      <h2 class="segment-heading">{props.title}</h2>
+      <p class="segment-subtext">{props.children}</p>
+    </>
   );
 }

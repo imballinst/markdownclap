@@ -4,7 +4,8 @@ import {
   inspectContentStore,
   InspectStatus,
   setInspectContent,
-  setInspectStatus
+  setInspectStatus,
+  inspectStatusStore
 } from '../../store/inspect';
 import './MarkdownEditor.css';
 import { useStore } from '@nanostores/solid';
@@ -24,13 +25,14 @@ import { parseTableFromTabbedText } from '../../utils/parsers/table';
 
 export const MarkdownEditor = () => {
   const markdown = useStore(markdownStore);
+  const editor = useStore(inspectContentStore);
+  const inspectStatus = useStore(inspectStatusStore);
 
   const [selected, setSelected] = createSignal<[number, number] | undefined>(undefined);
   const [prevSelected, setPrevSelected] = createSignal<[number, number] | undefined>(undefined);
   const [textAreaElement, setTextAreaElement] = createSignal<HTMLTextAreaElement | undefined>(
     undefined
   );
-  const editor = useStore(inspectContentStore);
 
   createEffect<string | undefined>((previous) => {
     const rawContent = editor()?.rawContent;
@@ -151,8 +153,15 @@ export const MarkdownEditor = () => {
     return selectedValue[0] === selectedValue[1];
   }
 
+  createEffect(() => {
+    console.info(editor());
+  });
+
   return (
-    <div class="flex flex-col mt-4">
+    <fieldset
+      class="flex flex-col mt-4"
+      disabled={inspectStatus() === InspectStatus.InspectingSnippet}
+    >
       <div class="flex justify-between">
         <Toolbar setSelected={setSelected} textAreaElement={textAreaElement} />
 
@@ -208,6 +217,6 @@ export const MarkdownEditor = () => {
           }
         }}
       />
-    </div>
+    </fieldset>
   );
 };

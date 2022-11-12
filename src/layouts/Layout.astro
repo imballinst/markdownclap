@@ -9,7 +9,7 @@ export interface Props {
 }
 
 const { title } = Astro.props as Props;
-const origin = (Astro.site?.href || '') + trimSlashes(import.meta.env.BASE_PATH || '')
+const origin = (Astro.site?.href || '') + trimSlashes(import.meta.env.BASE_PATH || '');
 
 const date = new Date();
 const currentYear = date.getUTCFullYear().toString().padStart(2, '0');
@@ -21,7 +21,6 @@ let version = 'dev';
 if (import.meta.env.VERSION && import.meta.env.GIT_HASH) {
   version = `${import.meta.env.VERSION}.${import.meta.env.GIT_HASH}`;
 }
-
 ---
 
 <!DOCTYPE html>
@@ -32,22 +31,25 @@ if (import.meta.env.VERSION && import.meta.env.GIT_HASH) {
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 
     <!-- Primary Meta Tags -->
-    <meta name="title" content={title}>
-    <meta name="description" content="Update Markdown tables easier with Markdown Clap.">
+    <meta name="title" content={title} />
+    <meta name="description" content="Update Markdown tables easier with Markdown Clap." />
 
     <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content={origin}>
-    <meta property="og:title" content={title}>
-    <meta property="og:description" content="Update Markdown tables easier with Markdown Clap.">
-    <meta property="og:image" content={origin + "/markdownclap-big.png"}>
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={origin} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content="Update Markdown tables easier with Markdown Clap." />
+    <meta property="og:image" content={origin + '/markdownclap-big.png'} />
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content={origin}>
-    <meta property="twitter:title" content={title}>
-    <meta property="twitter:description" content="Update Markdown tables easier with Markdown Clap.">
-    <meta property="twitter:image" content={origin + "/markdownclap-big.png"}>
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={origin} />
+    <meta property="twitter:title" content={title} />
+    <meta
+      property="twitter:description"
+      content="Update Markdown tables easier with Markdown Clap."
+    />
+    <meta property="twitter:image" content={origin + '/markdownclap-big.png'} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -109,6 +111,13 @@ if (import.meta.env.VERSION && import.meta.env.GIT_HASH) {
         box-shadow: theme('boxShadow.sm');
         font-weight: theme('fontWeight.medium');
         border-radius: theme('borderRadius.md');
+      }
+
+      :global(input:disabled),
+      :global(button:disabled),
+      :global(textarea:disabled),
+      :global(select:disabled) {
+        color: theme('colors.gray.500');
       }
 
       :global(input),
