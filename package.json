@@ -19,6 +19,7 @@
   "dependencies": {
     "@nanostores/solid": "0.2.0",
     "classnames": "2.3.1",
+    "csv-parse": "5.3.2",
     "marked": "4.1.0",
     "nanostores": "0.6"
   },

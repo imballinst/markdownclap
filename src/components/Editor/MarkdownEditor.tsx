@@ -4,7 +4,8 @@ import {
   inspectContentStore,
   InspectStatus,
   setInspectContent,
-  setInspectStatus
+  setInspectStatus,
+  inspectStatusStore
 } from '../../store/inspect';
 import './MarkdownEditor.css';
 import { useStore } from '@nanostores/solid';
@@ -20,17 +21,23 @@ import { modifyTextSelection, Toolbar } from './Toolbar';
 import { ToolbarAction } from '../../utils/operators/toolbar';
 import { Button } from '../Button';
 import { getToolbarHoverText } from './Toolbar/common';
-import { parseTableFromTabbedText } from '../../utils/parsers/table';
+import {
+  parseTableFromCommaSeparatedText,
+  parseTableFromTabbedText
+} from '../../utils/parsers/table';
 
 export const MarkdownEditor = () => {
   const markdown = useStore(markdownStore);
+  const editor = useStore(inspectContentStore);
+  const inspectStatus = useStore(inspectStatusStore);
 
   const [selected, setSelected] = createSignal<[number, number] | undefined>(undefined);
   const [prevSelected, setPrevSelected] = createSignal<[number, number] | undefined>(undefined);
   const [textAreaElement, setTextAreaElement] = createSignal<HTMLTextAreaElement | undefined>(
     undefined
   );
-  const editor = useStore(inspectContentStore);
+
+  const [isRawPaste, setIsRawPaste] = createSignal(false);
 
   createEffect<string | undefined>((previous) => {
     const rawContent = editor()?.rawContent;
@@ -81,6 +88,11 @@ export const MarkdownEditor = () => {
   };
 
   const onKeyDown: JSX.TextareaHTMLAttributes<HTMLTextAreaElement>['onKeyDown'] = (e) => {
+    if (e.key.toLowerCase() === 'v' && e.shiftKey && isCtrlOrCmdKey(e)) {
+      setIsRawPaste(true);
+      return;
+    }
+
     const { selectionStart, selectionEnd } = e.currentTarget;
 
     if (e.key === 'Tab' && selectionStart === selectionEnd) {
@@ -152,7 +164,10 @@ export const MarkdownEditor = () => {
   }
 
   return (
-    <div class="flex flex-col mt-4">
+    <fieldset
+      class="flex flex-col mt-4"
+      disabled={inspectStatus() === InspectStatus.InspectingSnippet}
+    >
       <div class="flex justify-between">
         <Toolbar setSelected={setSelected} textAreaElement={textAreaElement} />
 
@@ -194,13 +209,27 @@ export const MarkdownEditor = () => {
           setMarkdown(nextValue);
         }}
         onPaste={(e) => {
+          if (isRawPaste()) {
+            // Reset the thing that we set on `onKeyDown`.
+            // Since we don't do prevent default here, it'll passthrough to `onInput`.
+            setIsRawPaste(false);
+            return;
+          }
+
           const pasted = e.clipboardData?.getData('text/plain');
-          const parseResult = parseTableFromTabbedText(pasted);
+          // First, try parse from tabbed text.
+          let parseResult = parseTableFromTabbedText(pasted);
+          if (!parseResult) {
+            // If the parse fails, check with comma-separated.
+            parseResult = parseTableFromCommaSeparatedText(pasted);
+            console.debug(parseResult);
+          }
+
           if (parseResult) {
             e.preventDefault();
             const selectionStart = e.currentTarget.selectionStart;
             setMarkdown((prev) =>
-              prev.slice(0, selectionStart).concat(parseResult).concat(prev.slice(selectionStart))
+              prev.slice(0, selectionStart).concat(parseResult!).concat(prev.slice(selectionStart))
             );
 
             const nextSelectionRange = selectionStart + parseResult.length;
@@ -208,6 +237,6 @@ export const MarkdownEditor = () => {
           }
         }}
       />
-    </div>
+    </fieldset>
   );
 };

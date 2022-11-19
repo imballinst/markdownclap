@@ -7,7 +7,7 @@ import { SegmentHeading } from '../components/Editor/SegmentHeading';
 
 <div class="p-4">
   <div class="editor">
-    <div class="editor-segment">
+    <section class="editor-segment">
       <SegmentHeading title="Raw content">
         Fill input below with Markdown. Currently supported formats are
         <Link href="https://github.github.com/gfm/">GFM</Link> and
@@ -15,10 +15,10 @@ import { SegmentHeading } from '../components/Editor/SegmentHeading';
       </SegmentHeading>
 
       <MarkdownEditor client:visible />
-    </div>
-    <div class="editor-segment">
+    </section>
+    <section class="editor-segment">
       <RightContent client:visible />
-    </div>
+    </section>
   </div>
 </div>
 
