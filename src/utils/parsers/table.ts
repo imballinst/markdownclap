@@ -1,3 +1,5 @@
+import { parse } from 'csv-parse/sync'
+
 export function parseTableFromTabbedText(text: string | undefined): string | undefined {
   if (!text) return undefined
 
@@ -6,5 +8,23 @@ export function parseTableFromTabbedText(text: string | undefined): string | und
   const allLinesHaveEqualTabCount = tabCountPerLine.every(tabCount => tabCount === tabCountPerLine[0] && tabCount > 0)
 
   if (!allLinesHaveEqualTabCount) return undefined
-  return lines.map(line => `|${line.replace(/\|/g, '\\|').replace(/\t+/g, '|')}|`).join('\n')
+  return lines.map(line => `|${escapePipes(line).replace(/\t+/g, '|')}|`).join('\n')
+}
+
+export function parseTableFromCommaSeparatedText(text: string | undefined): string | undefined {
+  if (!text) return undefined
+  
+  try {
+    const parsed: string[][] = parse(text.trim(), { skipEmptyLines: true })
+    if (parsed.length === 1 && parsed[0].length === 1) return undefined
+
+    return parsed.map(line => `|${line.map(column => escapePipes(column)).join('|')}|`).join('\n')
+  } catch (err) {
+    return undefined
+  }
+}
+
+// Helper functions.
+function escapePipes(line: string) {
+  return line.replace(/\|/g, '\\|')
 }

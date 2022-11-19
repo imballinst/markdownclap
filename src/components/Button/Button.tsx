@@ -16,6 +16,7 @@ export function Button({ children, class: className, variant, size, isDisabled, 
       data-size={size}
       disabled={isDisabled ? isDisabled() : false}
       {...props}
+      aria-label={props.title}
     >
       {children}
     </button>

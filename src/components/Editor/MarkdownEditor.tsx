@@ -34,6 +34,8 @@ export const MarkdownEditor = () => {
     undefined
   );
 
+  const [isRawPaste, setIsRawPaste] = createSignal(false);
+
   createEffect<string | undefined>((previous) => {
     const rawContent = editor()?.rawContent;
 
@@ -83,6 +85,11 @@ export const MarkdownEditor = () => {
   };
 
   const onKeyDown: JSX.TextareaHTMLAttributes<HTMLTextAreaElement>['onKeyDown'] = (e) => {
+    if (e.key.toLowerCase() === 'v' && e.shiftKey && isCtrlOrCmdKey(e)) {
+      setIsRawPaste(true);
+      return;
+    }
+
     const { selectionStart, selectionEnd } = e.currentTarget;
 
     if (e.key === 'Tab' && selectionStart === selectionEnd) {
@@ -153,10 +160,6 @@ export const MarkdownEditor = () => {
     return selectedValue[0] === selectedValue[1];
   }
 
-  createEffect(() => {
-    console.info(editor());
-  });
-
   return (
     <fieldset
       class="flex flex-col mt-4"
@@ -203,6 +206,13 @@ export const MarkdownEditor = () => {
           setMarkdown(nextValue);
         }}
         onPaste={(e) => {
+          if (isRawPaste()) {
+            // Reset the thing that we set on `onKeyDown`.
+            // Since we don't do prevent default here, it'll passthrough to `onInput`.
+            setIsRawPaste(false);
+            return;
+          }
+
           const pasted = e.clipboardData?.getData('text/plain');
           const parseResult = parseTableFromTabbedText(pasted);
           if (parseResult) {
@@ -214,6 +224,7 @@ export const MarkdownEditor = () => {
 
             const nextSelectionRange = selectionStart + parseResult.length;
             e.currentTarget.setSelectionRange(nextSelectionRange, nextSelectionRange);
+            return;
           }
         }}
       />
