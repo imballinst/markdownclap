@@ -117,4 +117,28 @@ this is a | valid table,hey!
 |this is a \\| valid table|hey!|
     `.trim())
   })
+
+  test('valid case, with quotes', () => {
+    const str = `
+hello,world
+"this is a valid, table",hey!
+    `
+
+    expect(parseTableFromCommaSeparatedText(str)).toBe(`
+|hello|world|
+|this is a valid, table|hey!|
+    `.trim())
+  })
+
+  test('valid case, with uneven quotes', () => {
+    const str = `
+hello,world
+“this is a valid, table”,hey!    
+    `
+
+    expect(parseTableFromCommaSeparatedText(str)).toBe(`
+|hello|world|
+|this is a valid, table|hey!|
+    `.trim())
+  })
 })

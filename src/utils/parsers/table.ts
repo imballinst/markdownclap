@@ -1,4 +1,4 @@
-import { parse } from 'csv-parse/sync'
+import { parse } from 'csv-parse/browser/esm/sync'
 
 export function parseTableFromTabbedText(text: string | undefined): string | undefined {
   if (!text) return undefined
@@ -15,7 +15,7 @@ export function parseTableFromCommaSeparatedText(text: string | undefined): stri
   if (!text) return undefined
   
   try {
-    const parsed: string[][] = parse(text.trim(), { skipEmptyLines: true })
+    const parsed: string[][] = parse(text.trim().replace(/[“”]/g, '"'), { skipEmptyLines: true })
     if (parsed.length === 1 && parsed[0].length === 1) return undefined
 
     return parsed.map(line => `|${line.map(column => escapePipes(column)).join('|')}|`).join('\n')

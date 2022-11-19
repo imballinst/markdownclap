@@ -21,7 +21,10 @@ import { modifyTextSelection, Toolbar } from './Toolbar';
 import { ToolbarAction } from '../../utils/operators/toolbar';
 import { Button } from '../Button';
 import { getToolbarHoverText } from './Toolbar/common';
-import { parseTableFromTabbedText } from '../../utils/parsers/table';
+import {
+  parseTableFromCommaSeparatedText,
+  parseTableFromTabbedText
+} from '../../utils/parsers/table';
 
 export const MarkdownEditor = () => {
   const markdown = useStore(markdownStore);
@@ -214,17 +217,23 @@ export const MarkdownEditor = () => {
           }
 
           const pasted = e.clipboardData?.getData('text/plain');
-          const parseResult = parseTableFromTabbedText(pasted);
+          // First, try parse from tabbed text.
+          let parseResult = parseTableFromTabbedText(pasted);
+          if (!parseResult) {
+            // If the parse fails, check with comma-separated.
+            parseResult = parseTableFromCommaSeparatedText(pasted);
+            console.debug(parseResult);
+          }
+
           if (parseResult) {
             e.preventDefault();
             const selectionStart = e.currentTarget.selectionStart;
             setMarkdown((prev) =>
-              prev.slice(0, selectionStart).concat(parseResult).concat(prev.slice(selectionStart))
+              prev.slice(0, selectionStart).concat(parseResult!).concat(prev.slice(selectionStart))
             );
 
             const nextSelectionRange = selectionStart + parseResult.length;
             e.currentTarget.setSelectionRange(nextSelectionRange, nextSelectionRange);
-            return;
           }
         }}
       />
