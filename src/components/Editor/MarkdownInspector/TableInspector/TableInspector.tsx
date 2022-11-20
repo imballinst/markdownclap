@@ -12,6 +12,7 @@ import { HeaderButton } from './HeaderButton';
 import { Button } from '../../../Button';
 import { isCtrlOrCmdKey } from '../../../../utils/parsers/keycode';
 import { getToolbarHoverText } from '../../Toolbar/common';
+import { HOTKEYS } from '../../../../constants/hotkeys';
 
 const ARROW_UP_KEY = 'ArrowUp';
 const ARROW_DOWN_KEY = 'ArrowDown';
@@ -118,7 +119,7 @@ export function TableInspector({ result }: { result: ParsedTableResult | undefin
         variant="primary"
         size="sm"
         onClick={onSaveChanges}
-        title={getToolbarHoverText({ keys: ['Enter'] })}
+        title={getToolbarHoverText(HOTKEYS.FinishInspect)}
       >
         Save changes
       </Button>

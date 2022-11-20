@@ -5,21 +5,19 @@ import { Link } from '../components/Link';
 import { SegmentHeading } from '../components/Editor/SegmentHeading';
 ---
 
-<div class="p-4">
-  <div class="editor">
-    <section class="editor-segment">
-      <SegmentHeading title="Raw content">
-        Fill input below with Markdown. Currently supported formats are
-        <Link href="https://github.github.com/gfm/">GFM</Link> and
-        <Link href="https://commonmark.org">CommonMark</Link>.
-      </SegmentHeading>
+<div class="editor">
+  <section class="editor-segment">
+    <SegmentHeading title="Raw content">
+      Fill input below with Markdown. Currently supported formats are
+      <Link href="https://github.github.com/gfm/">GFM</Link> and
+      <Link href="https://commonmark.org">CommonMark</Link>.
+    </SegmentHeading>
 
-      <MarkdownEditor client:visible />
-    </section>
-    <section class="editor-segment">
-      <RightContent client:visible />
-    </section>
-  </div>
+    <MarkdownEditor client:visible />
+  </section>
+  <section class="editor-segment">
+    <RightContent client:visible />
+  </section>
 </div>
 
 <style>

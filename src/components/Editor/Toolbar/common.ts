@@ -1,15 +1,25 @@
+import { HotkeyContainerObject } from "../../../types/HotkeyContainerObject";
+
 export function getToolbarHoverText({
-  text = '',
-  keys
-}: {
-  text?: string
-  keys: string[]
-}) {
-  if (typeof window === 'undefined') return '';
+  defaultText,
+  withMetaKey,
+  keys,
+  combineMetaKey
+}: HotkeyContainerObject & { combineMetaKey?: boolean }) {
+  if (typeof window === 'undefined' && !combineMetaKey) return '';
 
-  const metaKey = navigator.userAgent.includes('Macintosh') ? 'Cmd' : 'Ctrl';
-  const hotkey = `${metaKey}+${keys.join('+')}`;
+  let hotkey = keys.join('+');
+  if (withMetaKey) {
+    let metaKey = ''
+    if (!combineMetaKey) {
+      metaKey = navigator.userAgent.includes('Macintosh') ? 'Cmd' : 'Ctrl'
+    } else {
+      metaKey = 'Cmd/Ctrl'
+    }
 
-  if (!text) return hotkey;
-  return `${text} (${hotkey})`
+    hotkey = `${metaKey}+${keys.join('+')}`
+  }
+
+  if (!defaultText) return hotkey;
+  return `${defaultText} (${hotkey})`
 }

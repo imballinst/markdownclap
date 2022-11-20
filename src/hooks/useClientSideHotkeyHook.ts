@@ -1,11 +1,6 @@
 import { Accessor, createSignal, onMount } from 'solid-js';
 import { getToolbarHoverText } from '../components/Editor/Toolbar/common';
-
-export interface HotkeyContainerObject {
-  defaultText: string;
-  keys: string[];
-  action?: string;
-}
+import { HotkeyContainerObject } from '../types/HotkeyContainerObject';
 
 interface UseClientSideHotkeyHookResult {
   buttonText: string;
@@ -32,12 +27,12 @@ export function useClientSideHotkeyHook<T extends HotkeyContainerObject>(default
     if (Array.isArray(defaultValue)) {
       setValue(defaultValue.map((item) => ({
         buttonText: item.defaultText,
-        buttonTitle: getToolbarHoverText({ keys: item.keys})
+        buttonTitle: getToolbarHoverText(item)
       })));
     } else {
       setValue({
         buttonText: defaultValue.defaultText,
-        buttonTitle: getToolbarHoverText({ keys: defaultValue.keys})
+        buttonTitle: getToolbarHoverText(defaultValue)
       });
     }
   });

@@ -6,6 +6,7 @@ import { getToolbarHoverText } from './common';
 import { HeadingToolbarButton } from './HeadingToolbarButton';
 import { CSVIcon } from '../../Icons/CSV';
 import { CSVToolbarButton } from './CSVToolbarButton';
+import { HOTKEYS } from '../../../constants/hotkeys';
 
 interface ToolbarProps {
   setSelected: Setter<[number, number] | undefined>;
@@ -37,7 +38,7 @@ export function Toolbar({ setSelected, textAreaElement }: ToolbarProps) {
         variant="primary"
         size="sm"
         class="w-8"
-        title={getToolbarHoverText({ text: 'Bold', keys: ['b'] })}
+        title={getToolbarHoverText(HOTKEYS.Bold)}
         onClick={onButtonClick}
         data-action={ToolbarAction.TOGGLE_BOLD}
       >
@@ -47,7 +48,7 @@ export function Toolbar({ setSelected, textAreaElement }: ToolbarProps) {
         variant="primary"
         size="sm"
         class="w-8"
-        title={getToolbarHoverText({ text: 'Italic', keys: ['i'] })}
+        title={getToolbarHoverText(HOTKEYS.Italic)}
         onClick={onButtonClick}
         data-action={ToolbarAction.TOGGLE_ITALIC}
       >
