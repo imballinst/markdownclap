@@ -1,16 +1,27 @@
+import classNames from 'classnames';
 import { JSXElement } from 'solid-js';
+import { Dynamic } from 'solid-js/web';
 import './SegmentHeading.css';
 
 interface SegmentHeadingProps {
   title: string;
-  children: JSXElement;
+  children?: JSXElement;
+  class?: string;
+  as?: 'h2' | 'h3';
 }
 
-export function SegmentHeading(props: SegmentHeadingProps) {
+export function SegmentHeading({
+  children,
+  title,
+  as: Component = 'h2',
+  class: className
+}: SegmentHeadingProps) {
   return (
     <>
-      <h2 class="segment-heading">{props.title}</h2>
-      <p class="segment-subtext">{props.children}</p>
+      <Dynamic component={Component} class={classNames('segment-heading', className)}>
+        {title}
+      </Dynamic>
+      {children && <p class="segment-subtext">{children}</p>}
     </>
   );
 }

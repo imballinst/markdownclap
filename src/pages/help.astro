@@ -1,0 +1,110 @@
+---
+import { SegmentHeading } from '../components/Editor/SegmentHeading';
+import { getToolbarHoverText } from '../components/Editor/Toolbar/common';
+import { Link } from '../components/Link';
+import { HOTKEYS, ShortcutText } from '../constants/hotkeys';
+import Layout from '../layouts/Layout.astro';
+
+const COPY_PASTE_OPERATIONS = {
+  [ShortcutText.Copy]: HOTKEYS.Copy,
+  [ShortcutText.Paste]: HOTKEYS.Paste,
+  [ShortcutText.PasteRaw]: HOTKEYS.PasteRaw
+};
+
+const DIRECT_TRANSFORMATION = {
+  [ShortcutText.Tab]: HOTKEYS.Tab,
+  [ShortcutText.Heading1]: HOTKEYS.Heading1,
+  [ShortcutText.Heading2]: HOTKEYS.Heading2,
+  [ShortcutText.Heading3]: HOTKEYS.Heading3,
+  [ShortcutText.Heading4]: HOTKEYS.Heading4,
+  [ShortcutText.Heading5]: HOTKEYS.Heading5,
+  [ShortcutText.Heading6]: HOTKEYS.Heading6,
+  [ShortcutText.Bold]: HOTKEYS.Bold,
+  [ShortcutText.Italic]: HOTKEYS.Italic
+};
+
+const INSPECTIONS = {
+  [ShortcutText.Inspect]: HOTKEYS.Inspect,
+  [ShortcutText.FinishInspect]: HOTKEYS.FinishInspect
+};
+---
+
+<Layout title="Markdown👏">
+  <SegmentHeading title="Help Page">
+    Below are the shortcuts available in Markdown Clap. There are 3 types of shortcuts available:
+    copy/paste operations, text transformations, and inspections.
+  </SegmentHeading>
+
+  <SegmentHeading title="Copy/paste Operations" as="h3" class="mt-4">
+    Copy and paste operations can be done from content outside of Markdown Clap. For example, if you
+    paste a comma-separated values (CSV) to the text input, then Markdown Clap will try to convert
+    it into a Markdown table automatically. Similarly, when you copy cells from a spreadsheet
+    application (browser-based or desktop-based), when pasted, Markdown Clap will also convert it
+    with the same fashion.
+  </SegmentHeading>
+
+  <ol class="ml-8 mt-4 text-sm text-slate-700">
+    {
+      Object.keys(COPY_PASTE_OPERATIONS).map((hotkey) => {
+        const item = HOTKEYS[hotkey as ShortcutText];
+
+        return (
+          <li>
+            {getToolbarHoverText({
+              ...HOTKEYS[hotkey as ShortcutText],
+              combineMetaKey: true
+            })}
+          </li>
+        );
+      })
+    }
+  </ol>
+
+  <SegmentHeading title="Direct transformations" as="h3" class="mt-4">
+    Direct transformations are ways to modify the text using mouse clicks or keyboard shortcuts a-la <Link
+      href="https://en.wikipedia.org/wiki/WYSIWYG">WYSIWYG</Link
+    >.
+  </SegmentHeading>
+
+  <ol class="ml-8 mt-4 text-sm text-slate-700">
+    {
+      Object.keys(DIRECT_TRANSFORMATION).map((hotkey) => {
+        const item = HOTKEYS[hotkey as ShortcutText];
+
+        return (
+          <li>
+            {getToolbarHoverText({
+              ...HOTKEYS[hotkey as ShortcutText],
+              combineMetaKey: true
+            })}
+          </li>
+        );
+      })
+    }
+  </ol>
+
+  <SegmentHeading title="Inspections" as="h3" class="mt-4">
+    Markdown inspections are the initial reason on why Markdown Clap was created. This inspection
+    feature allows improved Markdown table editing. For example, previously when we want to re-order
+    row numbers, then it is very chore work as we need to update every row number one-by-one.
+    However, with the inspection feature, we can just set the entire row numbers via the inspection
+    tools. Currently, only table inspection is supported.
+  </SegmentHeading>
+
+  <ol class="ml-8 mt-4 text-sm text-slate-700">
+    {
+      Object.keys(INSPECTIONS).map((hotkey) => {
+        const item = HOTKEYS[hotkey as ShortcutText];
+
+        return (
+          <li>
+            {getToolbarHoverText({
+              ...HOTKEYS[hotkey as ShortcutText],
+              combineMetaKey: true
+            })}
+          </li>
+        );
+      })
+    }
+  </ol>
+</Layout>

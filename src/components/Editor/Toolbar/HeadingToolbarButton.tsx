@@ -1,22 +1,21 @@
 import { createSignal, For } from 'solid-js';
 import { JSX } from 'solid-js/jsx-runtime';
-import {
-  HotkeyContainerObject,
-  useClientSideHotkeyHook
-} from '../../../hooks/useClientSideHotkeyHook';
+import { HOTKEYS } from '../../../constants/hotkeys';
+import { useClientSideHotkeyHook } from '../../../hooks/useClientSideHotkeyHook';
+import { HotkeyContainerObject } from '../../../types/HotkeyContainerObject';
 import { ToolbarAction } from '../../../utils/operators/toolbar';
 import { Button } from '../../Button';
 import { Popover, PopoverStyleState } from '../../Popover';
 
 import './HeadingToolbarButton.css';
 
-const HOTKEYS: HotkeyContainerObject[] = [
-  { defaultText: `Heading 1`, keys: ['Alt', '1'], action: ToolbarAction.TOOLBAR_HEADING_1 },
-  { defaultText: `Heading 2`, keys: ['Alt', '2'], action: ToolbarAction.TOOLBAR_HEADING_2 },
-  { defaultText: `Heading 3`, keys: ['Alt', '3'], action: ToolbarAction.TOOLBAR_HEADING_3 },
-  { defaultText: `Heading 4`, keys: ['Alt', '4'], action: ToolbarAction.TOOLBAR_HEADING_4 },
-  { defaultText: `Heading 5`, keys: ['Alt', '5'], action: ToolbarAction.TOOLBAR_HEADING_5 },
-  { defaultText: `Heading 6`, keys: ['Alt', '6'], action: ToolbarAction.TOOLBAR_HEADING_6 }
+const HEADING_HOTKEYS: HotkeyContainerObject[] = [
+  { ...HOTKEYS.Heading1, action: ToolbarAction.TOOLBAR_HEADING_1 },
+  { ...HOTKEYS.Heading2, action: ToolbarAction.TOOLBAR_HEADING_2 },
+  { ...HOTKEYS.Heading3, action: ToolbarAction.TOOLBAR_HEADING_3 },
+  { ...HOTKEYS.Heading4, action: ToolbarAction.TOOLBAR_HEADING_4 },
+  { ...HOTKEYS.Heading5, action: ToolbarAction.TOOLBAR_HEADING_5 },
+  { ...HOTKEYS.Heading6, action: ToolbarAction.TOOLBAR_HEADING_6 }
 ];
 
 interface HeadingToolbarButtonProps {
@@ -30,7 +29,7 @@ export function HeadingToolbarButton({ onClick }: HeadingToolbarButtonProps) {
   });
   const [isPopoverShown, setIsPopoverShown] = createSignal(false);
 
-  const hotkeys = useClientSideHotkeyHook(HOTKEYS);
+  const hotkeys = useClientSideHotkeyHook(HEADING_HOTKEYS);
 
   return (
     <>
@@ -64,7 +63,7 @@ export function HeadingToolbarButton({ onClick }: HeadingToolbarButtonProps) {
                   variant="ghost"
                   size="sm"
                   onClick={onClick}
-                  data-action={HOTKEYS[index()].action}
+                  data-action={HEADING_HOTKEYS[index()].action}
                 >
                   {hotkey.buttonText} ({hotkey.buttonTitle})
                 </Button>

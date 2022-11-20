@@ -1,7 +1,25 @@
 .segment-heading {
-  font-size: theme('fontSize.lg');
   font-weight: theme('fontWeight.medium');
 }
+
+h1.segment-heading {
+  font-size: theme('fontSize.3xl');
+}
+
+h2.segment-heading {
+  font-size: theme('fontSize.2xl');
+}
+
+h3.segment-heading {
+  font-size: theme('fontSize.xl');
+}
+
+h4.segment-heading,
+h5.segment-heading,
+h6.segment-heading {
+  font-size: theme('fontSize.lg');
+}
+
 
 .segment-subtext {
   font-size: theme('fontSize.sm');
