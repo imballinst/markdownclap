@@ -7,6 +7,7 @@ import { HeadingToolbarButton } from './HeadingToolbarButton';
 import { CSVIcon } from '../../Icons/CSV';
 import { CSVToolbarButton } from './CSVToolbarButton';
 import { HOTKEYS } from '../../../constants/hotkeys';
+import { LinkToolbarButton } from './LinkToolbarButton';
 
 interface ToolbarProps {
   setSelected: Setter<[number, number] | undefined>;
@@ -57,6 +58,7 @@ export function Toolbar({ setSelected, textAreaElement }: ToolbarProps) {
       <HeadingToolbarButton onClick={onButtonClick} />
 
       <CSVToolbarButton textAreaElement={textAreaElement} />
+      <LinkToolbarButton textAreaElement={textAreaElement} />
     </div>
   );
 }

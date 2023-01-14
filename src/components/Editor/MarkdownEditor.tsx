@@ -25,6 +25,7 @@ import {
   parseTableFromCommaSeparatedText,
   parseTableFromTabbedText
 } from '../../utils/parsers/table';
+import { HOTKEYS } from '../../constants/hotkeys';
 
 export const MarkdownEditor = () => {
   const markdown = useStore(markdownStore);
@@ -138,6 +139,12 @@ export const MarkdownEditor = () => {
           onInspectElement();
           break;
         }
+        case 'k': {
+          e.preventDefault();
+          // TODO: enable show modal from here for the link.
+          // action = ToolbarAction.
+          break;
+        }
         default: {
           break;
         }
@@ -175,7 +182,7 @@ export const MarkdownEditor = () => {
           variant="primary"
           size="sm"
           isDisabled={isInspectSelectionButtonDisabled}
-          title={getToolbarHoverText({ text: 'Inspect Element', keys: ['Shift', 'i'] })}
+          title={getToolbarHoverText(HOTKEYS.Inspect)}
           onClick={onInspectElement}
         >
           Inspect Element

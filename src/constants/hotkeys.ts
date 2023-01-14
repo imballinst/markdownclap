@@ -15,6 +15,8 @@ export enum ShortcutText {
   Heading6 = 'Heading6',
   Bold = 'Bold',
   Italic = 'Italic',
+  // Links.
+  AddOrRemoveLink = 'AddOrRemoveLink',
   // Inspections.
   Inspect = 'Inspect',
   FinishInspect = 'FinishInspect'
@@ -43,10 +45,12 @@ export const HOTKEYS: Record<ShortcutText, HotkeyContainerObject> = {
   [ShortcutText.Heading6]: { defaultText: `Heading 6`, keys: ['Alt', '6'], withMetaKey: true },
   [ShortcutText.Bold]: { defaultText: `Bold`, keys: ['b'], withMetaKey: true },
   [ShortcutText.Italic]: { defaultText: `Italic`, keys: ['i'], withMetaKey: true },
+  // Links.
+  [ShortcutText.AddOrRemoveLink]: { defaultText: `Add or remove link`, keys: ['k'], withMetaKey: true },
   // Inspections.
   [ShortcutText.Inspect]: {
     defaultText: `Inspect element`,
-    keys: ['Shift', 'i'],
+    keys: ['Shift', '`'],
     withMetaKey: true
   },
   [ShortcutText.FinishInspect]: { defaultText: `Save changes`, keys: ['Enter'], withMetaKey: true }
