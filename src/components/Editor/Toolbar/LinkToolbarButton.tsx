@@ -1,4 +1,4 @@
-import { Accessor, createSignal } from 'solid-js';
+import { Accessor, createSignal, JSX } from 'solid-js';
 import { HOTKEYS } from '../../../constants/hotkeys';
 import { Button } from '../../Button';
 import { LinkIcon } from '../../Icons/Link';
@@ -9,9 +9,13 @@ interface LinkToolbarButtonProps {
   textAreaElement: Accessor<HTMLTextAreaElement | undefined>;
 }
 
-// TODO: continue here
 export function LinkToolbarButton({ textAreaElement }: LinkToolbarButtonProps) {
   const [isModalOpen, setIsModalOpen] = createSignal(false);
+
+  const onSubmit: JSX.DOMAttributes<HTMLFormElement>['onSubmit'] = (e) => {
+    e.preventDefault();
+    // TODO: continue here
+  };
 
   return (
     <>
@@ -26,7 +30,25 @@ export function LinkToolbarButton({ textAreaElement }: LinkToolbarButtonProps) {
       </Button>
 
       <Modal isVisible={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <div>Hello world</div>
+        <form class="flex flex-col gap-2 p-4 pb-6" onSubmit={onSubmit}>
+          <h3 class="font-medium">Insert link</h3>
+
+          <div class="flex flex-col justify-center items-start text-sm gap-1">
+            <label for="link-modal--text">Text</label>
+
+            <input class="block w-full" name="text" id="link-modal--text" />
+          </div>
+
+          <div class="flex flex-col justify-center items-start text-sm gap-1">
+            <label for="link-modal--url">URL</label>
+
+            <input class="block w-full" name="url" id="link-modal--url" />
+          </div>
+
+          <Button class="mt-4" variant="primary" type="submit">
+            Update
+          </Button>
+        </form>
       </Modal>
     </>
   );

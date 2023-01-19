@@ -10,22 +10,22 @@ interface ModalProps {
   className?: string;
   isVisible: Accessor<boolean>;
   onClose: () => void;
-  modalStyle?: Accessor<JSX.CSSProperties>;
+  modalStyle?: JSX.CSSProperties;
   children: JSX.Element;
 }
 
-export function Modal({ isVisible, onClose, modalStyle, children, className }: ModalProps) {
+export function Modal(props: ModalProps) {
   return (
-    <Show when={isVisible()}>
+    <Show when={props.isVisible()}>
       <Portal>
-        <div role="presentation" class="modal-root">
-          <div aria-hidden="true" class="modal-backdrop" onClick={onClose} />
+        <div role="presentation" class="modal-root flex flex-col justify-center items-center">
+          <div aria-hidden="true" class="modal-backdrop" onClick={props.onClose} />
           <div
             tabIndex={-1}
-            class={classNames(className, 'modal-dropdown')}
-            style={modalStyle ? modalStyle() : undefined}
+            class={classNames(props.className, 'bg-slate-100 z-20 rounded')}
+            style={props.modalStyle}
           >
-            {children}
+            {props.children}
           </div>
         </div>
       </Portal>

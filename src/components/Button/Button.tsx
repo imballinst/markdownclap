@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { Accessor, JSX } from 'solid-js';
+import { Accessor, JSX, splitProps } from 'solid-js';
 import './Button.css';
 
 interface Props extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'disabled'> {
@@ -8,17 +8,26 @@ interface Props extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'disab
   isDisabled?: Accessor<boolean>;
 }
 
-export function Button({ children, class: className, variant, size, isDisabled, ...props }: Props) {
+export function Button(props: Props) {
+  const [local, rest] = splitProps(props, [
+    'children',
+    'class',
+    'variant',
+    'size',
+    'isDisabled',
+    'title'
+  ]);
+
   return (
     <button
-      class={classNames('button', className)}
-      data-variant={variant}
-      data-size={size}
-      disabled={isDisabled ? isDisabled() : false}
-      {...props}
+      class={classNames('button', local.class)}
+      data-variant={local.variant}
+      data-size={local.size}
+      disabled={local.isDisabled ? local.isDisabled() : false}
+      {...rest}
       aria-label={props.title}
     >
-      {children}
+      {local.children}
     </button>
   );
 }
