@@ -1,9 +1,12 @@
+import { useStore } from '@nanostores/solid';
 import { Accessor, createSignal, JSX } from 'solid-js';
 import { HOTKEYS } from '../../../constants/hotkeys';
+import { setMarkdown } from '../../../store/markdown';
 import { Button } from '../../Button';
 import { LinkIcon } from '../../Icons/Link';
 import { Modal } from '../../Modal/Modal';
 import { getToolbarHoverText } from './common';
+import { markdownStore } from '../../../store/markdown'
 
 interface LinkToolbarButtonProps {
   textAreaElement: Accessor<HTMLTextAreaElement | undefined>;
@@ -11,10 +14,30 @@ interface LinkToolbarButtonProps {
 
 export function LinkToolbarButton({ textAreaElement }: LinkToolbarButtonProps) {
   const [isModalOpen, setIsModalOpen] = createSignal(false);
+  const markdown = useStore(markdownStore)
 
   const onSubmit: JSX.DOMAttributes<HTMLFormElement>['onSubmit'] = (e) => {
     e.preventDefault();
-    // TODO: continue here
+    
+    const prevMarkdown = markdown()
+    const formData = new FormData(e.currentTarget)
+
+    const textAreaEl = textAreaElement();
+    if (!textAreaEl) return;
+
+    const { selectionStart, selectionEnd } = textAreaEl;
+    
+
+    setMarkdown((prev) => {
+
+
+      
+      return ''
+      // return prev
+      //   .slice(0, selectionStart)
+      //   .concat(`${headersMd}\n${separatorsMd}\n${bodyMd}`)
+      //   .concat(prev.slice(selectionStart));
+    });
   };
 
   return (
@@ -46,7 +69,7 @@ export function LinkToolbarButton({ textAreaElement }: LinkToolbarButtonProps) {
           </div>
 
           <Button class="mt-4" variant="primary" type="submit">
-            Update
+            Update Link
           </Button>
         </form>
       </Modal>
