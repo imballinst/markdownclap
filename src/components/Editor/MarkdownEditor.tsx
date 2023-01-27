@@ -26,6 +26,7 @@ import {
   parseTableFromTabbedText
 } from '../../utils/parsers/table';
 import { HOTKEYS } from '../../constants/hotkeys';
+import { parseSelectionAndOpenModal } from './Toolbar/LinkToolbarButton';
 
 export const MarkdownEditor = () => {
   const markdown = useStore(markdownStore);
@@ -141,8 +142,10 @@ export const MarkdownEditor = () => {
         }
         case 'k': {
           e.preventDefault();
-          // TODO: enable show modal from here for the link.
-          // action = ToolbarAction.
+          const textAreaEl = textAreaElement()
+          if (!textAreaEl) return
+
+          parseSelectionAndOpenModal({ selection: [textAreaEl.selectionStart, textAreaEl.selectionEnd], markdown: markdown() })
           break;
         }
         default: {

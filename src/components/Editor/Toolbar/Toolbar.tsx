@@ -4,10 +4,10 @@ import { getTextFromAction, ToolbarAction } from '../../../utils/operators/toolb
 import { Button } from '../../Button';
 import { getToolbarHoverText } from './common';
 import { HeadingToolbarButton } from './HeadingToolbarButton';
-import { CSVIcon } from '../../Icons/CSV';
 import { CSVToolbarButton } from './CSVToolbarButton';
 import { HOTKEYS } from '../../../constants/hotkeys';
 import { LinkToolbarButton } from './LinkToolbarButton';
+import { ToolbarProcessResultType } from './types';
 
 interface ToolbarProps {
   setSelected: Setter<[number, number] | undefined>;
@@ -74,10 +74,9 @@ export function modifyTextSelection({
   action,
   textAreaValue,
   selected
-}: FirstGetTextFromActionParams & { selected: [number, number] | undefined }): {
-  selected: [number, number];
-  markdown: string;
-} {
+}: FirstGetTextFromActionParams & {
+  selected: [number, number] | undefined;
+}): ToolbarProcessResultType {
   if (!selected) {
     return {
       selected: [0, 0],

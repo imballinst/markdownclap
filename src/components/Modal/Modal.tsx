@@ -8,7 +8,7 @@ export type ModalStyleState = Pick<JSX.CSSProperties, 'left' | 'top'>;
 
 interface ModalProps {
   className?: string;
-  isVisible: Accessor<boolean>;
+  isVisible: boolean;
   onClose: () => void;
   modalStyle?: JSX.CSSProperties;
   children: JSX.Element;
@@ -16,7 +16,7 @@ interface ModalProps {
 
 export function Modal(props: ModalProps) {
   return (
-    <Show when={props.isVisible()}>
+    <Show when={props.isVisible}>
       <Portal>
         <div role="presentation" class="modal-root flex flex-col justify-center items-center">
           <div aria-hidden="true" class="modal-backdrop" onClick={props.onClose} />

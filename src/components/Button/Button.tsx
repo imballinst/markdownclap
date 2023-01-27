@@ -15,7 +15,6 @@ export function Button(props: Props) {
     'variant',
     'size',
     'isDisabled',
-    'title'
   ]);
 
   return (
