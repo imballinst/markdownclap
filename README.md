@@ -4,6 +4,8 @@
 
 Generally, updating Markdown is easy. We can just use our text editor or use a lot of online tools that allow Markdown previewing. However, one of the pain points that I felt when editing Markdown was when updating tables. When I need to remove a row with ordered numbers, I need to also update ALL ROWS below the deleted row. This is a chore and I think it is a room for improvement.
 
+**Try it out**: https://imballinst.github.io/markdownclap.
+
 ## Main Features
 
 1. Markdown preview
@@ -11,6 +13,7 @@ Generally, updating Markdown is easy. We can just use our text editor or use a l
    1. Tables
 3. Import CSV file into Markdown table
 4. Paste cells from other source of spreadsheet as Markdown table
+5. WYSIWYG-like toolbars and shortcuts (bold, italic, headings, links)
 
 ## Development
 
