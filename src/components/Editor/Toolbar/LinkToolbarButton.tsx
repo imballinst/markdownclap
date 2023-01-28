@@ -1,15 +1,13 @@
 import { useStore } from '@nanostores/solid';
-import { Accessor, createSignal, JSX, onMount } from 'solid-js';
+import { Accessor, JSX, onCleanup, onMount } from 'solid-js';
 import { HOTKEYS } from '../../../constants/hotkeys';
-import { setAlert } from '../../../store/alert';
 import { linkModalStore, setLinkModal } from '../../../store/link-modal';
 import { setMarkdown } from '../../../store/markdown';
-import { parseMarkdownLink, ParseMarkdownLinkError } from '../../../utils/operators/link';
+import { parseMarkdownLink } from '../../../utils/operators/link';
 import { Button } from '../../Button';
 import { LinkIcon } from '../../Icons/Link';
 import { Modal } from '../../Modal/Modal';
 import { getToolbarHoverText } from './common';
-import { ToolbarProcessResultType } from './types';
 
 interface LinkToolbarButtonProps {
   textAreaElement: Accessor<HTMLTextAreaElement | undefined>;
@@ -109,12 +107,21 @@ export function LinkToolbarButton({ textAreaElement }: LinkToolbarButtonProps) {
 
 // Child component.
 function LinkModalContent({ children }: { children: JSX.Element }) {
+  function onEscapeKey(e: KeyboardEvent) {
+    if (e.code === 'Escape') setLinkModal(undefined);
+  }
+
   onMount(() => {
+    // Add escape listener.
+    window.addEventListener('keydown', onEscapeKey);
+
     const inputElement = document.getElementById(LINK_MODAL_TEXT_INPUT_ID);
     if (!inputElement) return;
 
     inputElement.focus();
   });
+
+  onCleanup(() => window.removeEventListener('keydown', onEscapeKey));
 
   return <>{children}</>;
 }
