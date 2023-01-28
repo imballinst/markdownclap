@@ -3,7 +3,7 @@ import { Accessor, JSX, onCleanup, onMount } from 'solid-js';
 import { HOTKEYS } from '../../../constants/hotkeys';
 import { linkModalStore, setLinkModal } from '../../../store/link-modal';
 import { setMarkdown } from '../../../store/markdown';
-import { parseMarkdownLink } from '../../../utils/operators/link';
+import { parseMarkdownLink } from '../../../utils/parsers/link';
 import { Button } from '../../Button';
 import { LinkIcon } from '../../Icons/Link';
 import { Modal } from '../../Modal/Modal';

@@ -1,5 +1,5 @@
 import { atom } from 'nanostores';
-import { ParseMarkdownLinkResult } from '../utils/operators/link';
+import { ParseMarkdownLinkResult } from '../utils/parsers/link';
 
 type ModalContent = ParseMarkdownLinkResult | undefined;
 

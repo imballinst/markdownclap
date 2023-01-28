@@ -27,6 +27,7 @@ import {
 } from '../../utils/parsers/table';
 import { HOTKEYS } from '../../constants/hotkeys';
 import { parseSelectionAndOpenModal } from './Toolbar/LinkToolbarButton';
+import { parseUrl } from '../../utils/parsers/link';
 
 export const MarkdownEditor = () => {
   const markdown = useStore(markdownStore);
@@ -142,10 +143,13 @@ export const MarkdownEditor = () => {
         }
         case 'k': {
           e.preventDefault();
-          const textAreaEl = textAreaElement()
-          if (!textAreaEl) return
+          const textAreaEl = textAreaElement();
+          if (!textAreaEl) return;
 
-          parseSelectionAndOpenModal({ selection: [textAreaEl.selectionStart, textAreaEl.selectionEnd], markdown: markdown() })
+          parseSelectionAndOpenModal({
+            selection: [textAreaEl.selectionStart, textAreaEl.selectionEnd],
+            markdown: markdown()
+          });
           break;
         }
         default: {
@@ -226,20 +230,19 @@ export const MarkdownEditor = () => {
             return;
           }
 
-          const pasted = e.clipboardData?.getData('text/plain');
-          // First, try parse from tabbed text.
-          let parseResult = parseTableFromTabbedText(pasted);
-          if (!parseResult) {
-            // If the parse fails, check with comma-separated.
-            parseResult = parseTableFromCommaSeparatedText(pasted);
-            console.debug(parseResult);
-          }
+          const pasted = e.clipboardData?.getData('text/plain') || '';
+          const { selectionStart, selectionEnd, value } = e.currentTarget;
+
+          const parseResult = processOnPaste(pasted, [
+            () => parseUrl(value.slice(selectionStart, selectionEnd), pasted),
+            parseTableFromTabbedText,
+            parseTableFromCommaSeparatedText
+          ]);
 
           if (parseResult) {
             e.preventDefault();
-            const selectionStart = e.currentTarget.selectionStart;
             setMarkdown((prev) =>
-              prev.slice(0, selectionStart).concat(parseResult!).concat(prev.slice(selectionStart))
+              prev.slice(0, selectionStart).concat(parseResult).concat(prev.slice(selectionEnd))
             );
 
             const nextSelectionRange = selectionStart + parseResult.length;
@@ -250,3 +253,17 @@ export const MarkdownEditor = () => {
     </fieldset>
   );
 };
+
+function processOnPaste(
+  str: string | undefined,
+  processors: Array<(val: string | undefined) => string | undefined>
+): string | undefined {
+  let result: string | undefined;
+
+  for (const processor of processors) {
+    result = processor(str);
+    if (result) break;
+  }
+
+  return result;
+}
