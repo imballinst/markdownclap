@@ -94,13 +94,13 @@ export function HeaderButton({ columnIndex, headers }: HeaderButtonProps) {
       >
         <form onSubmit={onSubmit}>
           <div class="flex flex-col mb-2">
-            <label for="popoverColumnAction" class="text-xs">
+            <label for="header-button--action" class="text-xs">
               Select column action
             </label>
             <select
               class="text-xs"
               name="type"
-              id="popoverColumnAction"
+              id="header-button--action"
               onInput={(e) => {
                 setColumnAction(e.currentTarget.value as ColumnActionsType);
               }}
@@ -131,10 +131,10 @@ export function HeaderButton({ columnIndex, headers }: HeaderButtonProps) {
             }
           >
             <div class="flex flex-col mb-2">
-              <label for="popoverColumnOperationPayload" class="text-xs">
+              <label for="header-button--action-payload" class="text-xs">
                 Column type
               </label>
-              <select id="popoverColumnOperationPayload" name="actionPayload" class="text-xs">
+              <select id="header-button--action-payload" name="actionPayload" class="text-xs">
                 <option class="text-xs" value="ordered-number">
                   Ordered number
                 </option>
@@ -147,10 +147,10 @@ export function HeaderButton({ columnIndex, headers }: HeaderButtonProps) {
 
           <Show when={columnAction() === 'swap-column'}>
             <div class="flex flex-col mb-2">
-              <label for="popoverSwapPayload" class="text-xs">
+              <label for="header-button--swap-payload" class="text-xs">
                 Column to swap
               </label>
-              <select id="popoverSwapPayload" class="text-xs" name="actionPayload">
+              <select id="header-button--swap-payload" class="text-xs" name="actionPayload">
                 {headers.map((header, headerIdx) => {
                   if (headerIdx === columnIndex) {
                     return null;

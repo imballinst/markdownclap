@@ -25,6 +25,8 @@ import {
   parseTableFromCommaSeparatedText,
   parseTableFromTabbedText
 } from '../../utils/parsers/table';
+import { HOTKEYS } from '../../constants/hotkeys';
+import { parseSelectionAndOpenModal } from './Toolbar/LinkToolbarButton';
 
 export const MarkdownEditor = () => {
   const markdown = useStore(markdownStore);
@@ -138,6 +140,14 @@ export const MarkdownEditor = () => {
           onInspectElement();
           break;
         }
+        case 'k': {
+          e.preventDefault();
+          const textAreaEl = textAreaElement()
+          if (!textAreaEl) return
+
+          parseSelectionAndOpenModal({ selection: [textAreaEl.selectionStart, textAreaEl.selectionEnd], markdown: markdown() })
+          break;
+        }
         default: {
           break;
         }
@@ -175,7 +185,7 @@ export const MarkdownEditor = () => {
           variant="primary"
           size="sm"
           isDisabled={isInspectSelectionButtonDisabled}
-          title={getToolbarHoverText({ text: 'Inspect Element', keys: ['Shift', 'i'] })}
+          title={getToolbarHoverText(HOTKEYS.Inspect)}
           onClick={onInspectElement}
         >
           Inspect Element
