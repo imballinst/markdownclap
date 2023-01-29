@@ -29,35 +29,38 @@ export function parseMarkdownLink(selection: string): ParseMarkdownLinkResult {
     return result;
   }
 
-  const html = marked(selection);
+  const html = marked(selection).trim();
   const el = document.createElement('div');
   el.innerHTML = html;
 
-  const childLength = el.childNodes.length;
-  if (childLength > 1) {
+  const supposedlyParagraph = el.childNodes.item(0) as HTMLElement;
+  const paragraphChildLength = supposedlyParagraph.childNodes.length;
+
+  if (paragraphChildLength > 1) {
     throw new ParseMarkdownLinkError(ParseMarkdownLinkErrorCode.INVALID_ELEMENTS);
   }
 
-  const nodeName = el.firstChild?.nodeName;
+  const nodeName = supposedlyParagraph.firstChild?.nodeName;
   switch (nodeName) {
     case '#text': {
       // Node is a textless href, or a simple text.
-      const isValidURL = isURL(el.innerText);
+      const isValidURL = isURL(supposedlyParagraph.innerText);
 
       if (isValidURL) {
-        result.url = el.innerText;
+        result.url = supposedlyParagraph.innerText;
       } else {
-        result.text = el.innerText;
+        result.text = supposedlyParagraph.innerText;
       }
 
       break;
     }
     case 'A': {
       // Node is an anchor tag with text.
-      const anchorTag = el.firstChild as HTMLAnchorElement;
+      const anchorTag = supposedlyParagraph.firstChild as HTMLAnchorElement;
       const textContent = anchorTag.childNodes.item(0) as Text;
-
-      result.text = textContent.nodeValue || '';
+      const textValue = textContent.nodeValue || '';
+      
+      result.text = trimTrailingSlash(textValue) === trimTrailingSlash(anchorTag.href) ? '' : textValue;
       result.url = anchorTag.href;
 
       break;
@@ -66,7 +69,7 @@ export function parseMarkdownLink(selection: string): ParseMarkdownLinkResult {
 
   // Trim trailing slash, if any, and if it's not contained in the original result.
   if (result.url.endsWith('/') && !selection.includes(result.url)) {
-    result.url = result.url.slice(0, -1);
+    result.url = trimTrailingSlash(result.url)
   }
 
   return result;
@@ -82,6 +85,7 @@ export function parseUrl(selection: string, urlString = ''): string | undefined 
   return `[${selection}](${urlString})`;
 }
 
+// Helper functions.
 function isURL(urlString: string) {
   let url: URL | undefined;
   try {
@@ -91,4 +95,10 @@ function isURL(urlString: string) {
   }
 
   return url !== undefined;
+}
+
+function trimTrailingSlash(urlString: string) {
+  // Trim trailing slash, if any, and if it's not contained in the original result.
+  if (urlString.endsWith('/')) return urlString.slice(0, -1);
+  return urlString
 }
