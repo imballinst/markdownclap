@@ -11,6 +11,6 @@ if (!basePath.startsWith('/')) {
 // https://astro.build/config
 export default defineConfig({
   base: basePath,
-  site: 'https://imballinst.github.io',
+  site: 'https://imballinst.github.io/',
   integrations: [solid(), tailwind()]
 });
