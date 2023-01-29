@@ -1,4 +1,4 @@
-import snarkdown from 'snarkdown';
+import { marked } from 'marked';
 
 export interface ParseMarkdownLinkResult {
   text: string;
@@ -29,7 +29,7 @@ export function parseMarkdownLink(selection: string): ParseMarkdownLinkResult {
     return result;
   }
 
-  const html = snarkdown(selection);
+  const html = marked(selection);
   const el = document.createElement('div');
   el.innerHTML = html;
 
@@ -74,12 +74,12 @@ export function parseMarkdownLink(selection: string): ParseMarkdownLinkResult {
 
 export function parseUrl(selection: string, urlString = ''): string | undefined {
   const url = isURL(urlString);
-  if (!url) return undefined
+  if (!url) return undefined;
 
   // If there are no selection, return the URL string directly.
-  if (selection === '') return urlString
+  if (selection === '') return urlString;
   // If there are selection, then return the Markdown URL + text.
-  return `[${selection}](${urlString})`
+  return `[${selection}](${urlString})`;
 }
 
 function isURL(urlString: string) {
