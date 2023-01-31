@@ -179,7 +179,7 @@ export const MarkdownEditor = () => {
 
   return (
     <fieldset
-      class="flex flex-col mt-4"
+      class="flex flex-col mt-4 h-full"
       disabled={inspectStatus() === InspectStatus.InspectingSnippet}
     >
       <div class="flex justify-between">

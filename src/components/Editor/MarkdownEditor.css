@@ -1,5 +1,5 @@
 .markdown-editor {
-  height: 400px;
+  height: 100%;
   overflow: auto;
   resize: none;
   margin-top: theme('spacing.2');
