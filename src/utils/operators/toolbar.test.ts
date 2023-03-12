@@ -10,12 +10,12 @@ helloworld. This is a sample text
     `.trim();
     let result = getTextFromAction({
       action: ToolbarAction.TOOLBAR_HEADING_1,
-      selectionEnd: initial.indexOf('3'),
-      selectionStart: initial.indexOf('3'),
+      selectionStart: initial.indexOf('test123'),
+      selectionEnd: initial.indexOf('test123'),
       textAreaValue: initial
     });
 
-    expect(result).toBe(
+    expect(result.text).toBe(
       `
 # test123
 
@@ -26,22 +26,22 @@ helloworld. This is a sample text
     // Try revert.
     result = getTextFromAction({
       action: ToolbarAction.TOOLBAR_HEADING_1,
-      selectionEnd: result.indexOf('3'),
-      selectionStart: result.indexOf('3'),
-      textAreaValue: result
+      selectionStart: result.selected[0],
+      selectionEnd: result.selected[1],
+      textAreaValue: result.text
     });
 
-    expect(result).toBe(initial);
+    expect(result.text).toBe(initial);
 
     // Try adding the heading again, this time heading 2.
     result = getTextFromAction({
       action: ToolbarAction.TOOLBAR_HEADING_2,
-      selectionEnd: result.indexOf('3'),
-      selectionStart: result.indexOf('3'),
-      textAreaValue: result
+      selectionStart: result.selected[0],
+      selectionEnd: result.selected[1],
+      textAreaValue: result.text
     });
 
-    expect(result).toBe(
+    expect(result.text).toBe(
       `
 ## test123
 
@@ -52,12 +52,12 @@ helloworld. This is a sample text
     // Try adding heading 3, the previous heading should be replaced.
     result = getTextFromAction({
       action: ToolbarAction.TOOLBAR_HEADING_3,
-      selectionEnd: result.indexOf('3'),
-      selectionStart: result.indexOf('3'),
-      textAreaValue: result
+      selectionStart: result.selected[0],
+      selectionEnd: result.selected[0],
+      textAreaValue: result.text
     });
 
-    expect(result).toBe(
+    expect(result.text).toBe(
       `
 ### test123
 
@@ -78,17 +78,17 @@ helloworld. This is a sample text
           textAreaValue: initial
         });
 
-        expect(result).toBe('test **helloworld** test');
+        expect(result.text).toBe('test **helloworld** test');
 
         // Revert back.
         result = getTextFromAction({
           action: ToolbarAction.TOGGLE_BOLD,
-          selectionStart: result.indexOf('helloworld'),
-          selectionEnd: result.indexOf('helloworld') + 'helloworld'.length,
-          textAreaValue: result
+          selectionStart: result.selected[0],
+          selectionEnd: result.selected[1],
+          textAreaValue: result.text
         });
 
-        expect(result).toBe('test helloworld test');
+        expect(result.text).toBe('test helloworld test');
       });
 
       test('italic', () => {
@@ -101,17 +101,17 @@ helloworld. This is a sample text
           textAreaValue: initial
         });
 
-        expect(result).toBe('test _helloworld_ test');
+        expect(result.text).toBe('test _helloworld_ test');
 
         // Revert back.
         result = getTextFromAction({
           action: ToolbarAction.TOGGLE_ITALIC,
-          selectionStart: result.indexOf('helloworld'),
-          selectionEnd: result.indexOf('helloworld') + 'helloworld'.length,
-          textAreaValue: result
+          selectionStart: result.selected[0],
+          selectionEnd: result.selected[1],
+          textAreaValue: result.text
         });
 
-        expect(result).toBe('test helloworld test');
+        expect(result.text).toBe('test helloworld test');
       });
     });
 
@@ -127,36 +127,36 @@ helloworld. This is a sample text
           textAreaValue: initial
         });
 
-        expect(result).toBe('test **helloworld** test');
+        expect(result.text).toBe('test **helloworld** test');
 
         // Then, italic.
         result = getTextFromAction({
           action: ToolbarAction.TOGGLE_ITALIC,
-          selectionStart: result.indexOf('helloworld'),
-          selectionEnd: result.indexOf('helloworld') + 'helloworld'.length,
-          textAreaValue: result
+          selectionStart: result.selected[0],
+          selectionEnd: result.selected[1],
+          textAreaValue: result.text
         });
 
-        expect(result).toBe('test **_helloworld_** test');
+        expect(result.text).toBe('test **_helloworld_** test');
 
         // Revert back.
         result = getTextFromAction({
           action: ToolbarAction.TOGGLE_ITALIC,
-          selectionStart: result.indexOf('helloworld'),
-          selectionEnd: result.indexOf('helloworld') + 'helloworld'.length,
-          textAreaValue: result
+          selectionStart: result.selected[0],
+          selectionEnd: result.selected[1],
+          textAreaValue: result.text
         });
 
-        expect(result).toBe('test **helloworld** test');
+        expect(result.text).toBe('test **helloworld** test');
 
         result = getTextFromAction({
           action: ToolbarAction.TOGGLE_BOLD,
-          selectionStart: result.indexOf('helloworld'),
-          selectionEnd: result.indexOf('helloworld') + 'helloworld'.length,
-          textAreaValue: result
+          selectionStart: result.selected[0],
+          selectionEnd: result.selected[1],
+          textAreaValue: result.text
         });
 
-        expect(result).toBe(initial);
+        expect(result.text).toBe(initial);
       });
     });
   });
