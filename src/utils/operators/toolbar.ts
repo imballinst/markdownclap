@@ -21,16 +21,20 @@ export function getTextFromAction({
   action: ToolbarAction;
 }) {
   let newText = textAreaValue;
+  let newSelection: [number, number] = [0, 0];
 
   switch (action) {
     case ToolbarAction.TOGGLE_BOLD:
     case ToolbarAction.TOGGLE_ITALIC: {
-      newText = toggleTextWrap({
+      const result = toggleTextWrap({
         text: newText,
         chars: action,
         selectionEnd,
         selectionStart
       });
+
+      newText = result.text;
+      newSelection = result.selected;
       break;
     }
     case ToolbarAction.TOOLBAR_HEADING_1:
@@ -76,6 +80,7 @@ export function getTextFromAction({
         .slice(0, indexOfLineStart)
         .concat(substr)
         .concat(newText.slice(nextNewLine));
+      newSelection = [indexOfLineStart + substr.length, indexOfLineStart + substr.length]
 
       break;
     }
@@ -83,7 +88,10 @@ export function getTextFromAction({
       break;
   }
 
-  return newText;
+  return {
+    text: newText,
+    selected: newSelection
+  };
 }
 
 // Helper functions.
@@ -97,7 +105,10 @@ function toggleTextWrap({
   selectionStart: number;
   selectionEnd: number;
   chars: string;
-}) {
+}): {
+  text: string;
+  selected: [number, number];
+} {
   const charsLength = chars.length;
 
   if (
@@ -105,17 +116,23 @@ function toggleTextWrap({
     text.slice(selectionEnd, selectionEnd + charsLength) === chars
   ) {
     // Remove.
-    return text
-      .slice(0, selectionStart - charsLength)
-      .concat(text.slice(selectionStart, selectionEnd))
-      .concat(text.slice(selectionEnd + charsLength));
+    return {
+      text: text
+        .slice(0, selectionStart - charsLength)
+        .concat(text.slice(selectionStart, selectionEnd))
+        .concat(text.slice(selectionEnd + charsLength)),
+      selected: [selectionStart - charsLength, selectionEnd - charsLength]
+    };
   }
 
   // Append.
-  return text
-    .slice(0, selectionStart)
-    .concat(chars)
-    .concat(text.slice(selectionStart, selectionEnd))
-    .concat(chars)
-    .concat(text.slice(selectionEnd));
+  return {
+    text: text
+      .slice(0, selectionStart)
+      .concat(chars)
+      .concat(text.slice(selectionStart, selectionEnd))
+      .concat(chars)
+      .concat(text.slice(selectionEnd)),
+    selected: [selectionStart + charsLength, selectionEnd + charsLength]
+  };
 }

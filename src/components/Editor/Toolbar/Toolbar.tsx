@@ -91,19 +91,11 @@ export function modifyTextSelection({
     selectionEnd,
     selectionStart
   });
-  let increment = action.length;
-
-  if (result.length < textAreaValue.length) {
-    // Removal.
-    increment *= -1;
-  } else {
-    // Otherwise, do nothing. This is adding the syntax process.
-  }
 
   return {
     // Increment the selection, because we are adding new characters before the text.
     // Or, decrement the selection indices, because of the same reason.
-    selected: [selectionStart + increment, selectionEnd + increment],
-    markdown: result
+    selected: result.selected,
+    markdown: result.text
   };
 }
